@@ -10,8 +10,8 @@ namespace Collector.Interface
 {
 	public interface IApiRequest
 	{
-		void SetBaseUri(string BaseUri);
-
+		Uri GetUri(string Method);
+		Uri GetUri(string Method, NameValueCollection Params);
 		Task<JObject> ExecuteRequest(string Method);
 		Task<JObject> ExecuteRequest(string Method, NameValueCollection Params);
 		Task<T> ExecuteRequest<T>(string Method);

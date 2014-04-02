@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="Api\BaseApi.cs" />
     <Compile Include="Api\BaseApiRequest.cs" />
+    <Compile Include="Api\VkApiRequest.cs" />
     <Compile Include="Common\DateTimeHelpers.cs" />
     <Compile Include="Common\UnixTimestampToDateTimeConverter.cs" />
     <Compile Include="Common\VkUserDeactivatedConverted.cs" />

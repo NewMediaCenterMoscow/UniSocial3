@@ -17,34 +17,32 @@ namespace Collector.Api
 		protected HttpClient client = new HttpClient();
 		protected string baseUri;
 
-		protected static int requestNumber = 0;
-
 		protected static int maxRepeats = 10;
 		protected static int baseRepeatInterval = 6000;
 
-		protected virtual Uri getUri(string baseUri, NameValueCollection Params)
+		public virtual Uri GetUri(string Method)
 		{
-			var builder = new UriBuilder(baseUri);
+			return GetUri(Method, new NameValueCollection());
+		}
 
-			if (Params != null)
-				builder.Query = String.Join("&", Params.AllKeys.Select(k => k + "=" + Params[k]));
+		public virtual Uri GetUri(string Method, NameValueCollection Params)
+		{
+			var uri = baseUri.TrimEnd('/') + '/' + Method.Trim('/');
+			var builder = new UriBuilder(uri);
+
+			builder.Query = String.Join("&", Params.AllKeys.Select(k => k + "=" + Params[k]));
 
 			return builder.Uri;
 		}
 
-		public virtual void SetBaseUri(string BaseUri)
-		{
-			this.baseUri = BaseUri;
-		}
-
 		public async Task<JObject> ExecuteRequest(string Method)
 		{
-			return await ExecuteRequest(Method, null);
+			return await ExecuteRequest(Method, new NameValueCollection());
 		}
 
 		public async Task<JObject> ExecuteRequest(string Method, NameValueCollection Params)
 		{
-			var requestUri = getUri(Method, Params);
+			var requestUri = GetUri(Method, Params);
 
 			string data = null;
 			var currentRepeat = 0;
@@ -75,7 +73,7 @@ namespace Collector.Api
 
 		public async Task<T> ExecuteRequest<T>(string Method)
 		{
-			return await ExecuteRequest<T>(Method, null);
+			return await ExecuteRequest<T>(Method, new NameValueCollection());
 		}
 
 		public async Task<T> ExecuteRequest<T>(string Method, NameValueCollection Params)

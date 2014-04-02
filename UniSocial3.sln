@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkerRole", "WorkerRole\Wo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Collector", "Collector\Collector.csproj", "{DBEA11C1-6F8F-4903-9363-E56DFF5220A5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Collector", "Test.Collector\Test.Collector.csproj", "{D115C218-8A0D-4920-8E34-B79C35284E1B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{DBEA11C1-6F8F-4903-9363-E56DFF5220A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DBEA11C1-6F8F-4903-9363-E56DFF5220A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DBEA11C1-6F8F-4903-9363-E56DFF5220A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D115C218-8A0D-4920-8E34-B79C35284E1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D115C218-8A0D-4920-8E34-B79C35284E1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D115C218-8A0D-4920-8E34-B79C35284E1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D115C218-8A0D-4920-8E34-B79C35284E1B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
