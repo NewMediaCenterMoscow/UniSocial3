@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +11,8 @@ namespace Collector.Api
 	public class VkApiRequest : BaseApiRequest
 	{
 		string apiVersion = "5.16";
+		string lang = "ru";
+
 		string accessToken = "zzz";
 
 		NameValueCollection vkParams;
@@ -22,9 +25,13 @@ namespace Collector.Api
 		{
 			baseUri = "https://api.vk.com/method/";
 
+			var settingsAccessToken = ConfigurationManager.AppSettings["vkAccessToken"];
+			if(!String.IsNullOrEmpty(settingsAccessToken))
+				accessToken = settingsAccessToken;
+
 			vkParams = new NameValueCollection();
 			vkParams.Add("v", apiVersion);
-			vkParams.Add("lang", "ru");
+			vkParams.Add("lang", lang);
 		}
 
 		bool isMethodNeedAuth(string method)

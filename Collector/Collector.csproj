@@ -35,6 +35,7 @@
       <HintPath>..\packages\Newtonsoft.Json.6.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Net.Http.Extensions">
@@ -53,12 +54,15 @@
   <ItemGroup>
     <Compile Include="Api\BaseApi.cs" />
     <Compile Include="Api\BaseApiRequest.cs" />
+    <Compile Include="Api\Settings\ApiSettings.cs" />
+    <Compile Include="Api\Settings\ApiSettingsJsonFileProvider.cs" />
     <Compile Include="Api\VkApiRequest.cs" />
     <Compile Include="Common\DateTimeHelpers.cs" />
     <Compile Include="Common\UnixTimestampToDateTimeConverter.cs" />
     <Compile Include="Common\VkUserDeactivatedConverted.cs" />
     <Compile Include="Interface\IApi.cs" />
     <Compile Include="Interface\IApiRequest.cs" />
+    <Compile Include="Interface\IApiSettingsProvider.cs" />
     <Compile Include="Models\Vk\VKBaseWallObject.cs" />
     <Compile Include="Models\Vk\VkComment.cs" />
     <Compile Include="Models\Vk\VkFriends.cs" />
@@ -74,6 +78,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Api\Settings\Vk.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

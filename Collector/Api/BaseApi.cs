@@ -14,13 +14,14 @@ namespace Collector.Api
 {
 	public abstract class BaseApi : IApi
 	{
+		IApi api;
+		IApiSettingsProvider apiSettingsProvider;
 
-
-		public BaseApi()
+		public BaseApi(IApi Api, IApiSettingsProvider ApiSettingsProvider)
 		{
-
+			this.api = Api;
+			this.apiSettingsProvider = ApiSettingsProvider;
 		}
-
 
 
 

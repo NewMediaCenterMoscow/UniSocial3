@@ -1,0 +1,13 @@
+﻿{"settings":[
+	{
+		"name":"test_method", 
+		"params":{
+			"batch_size": 1,
+			"items_max_count": 200,
+			"request_params": {
+				"test_param1": "test_val1",
+				"test2": "val2",
+			}
+		}
+	}
+]}

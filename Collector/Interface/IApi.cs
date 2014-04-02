@@ -9,7 +9,7 @@ namespace Collector.Interface
 {
 	public interface IApi
 	{
-
-
+		Task<T> GetObject<T>(string Method, string Id);
+		Task<T> GetObject<T>(string Method, List<string> Ids);
 	}
 }
