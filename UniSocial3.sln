@@ -7,6 +7,8 @@ Project("{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}") = "Worker", "Worker\Worker.ccp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkerRole", "WorkerRole\WorkerRole.csproj", "{B29137BB-979A-42C4-9D1C-10980484C832}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Collector", "Collector\Collector.csproj", "{DBEA11C1-6F8F-4903-9363-E56DFF5220A5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{B29137BB-979A-42C4-9D1C-10980484C832}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B29137BB-979A-42C4-9D1C-10980484C832}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B29137BB-979A-42C4-9D1C-10980484C832}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBEA11C1-6F8F-4903-9363-E56DFF5220A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBEA11C1-6F8F-4903-9363-E56DFF5220A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBEA11C1-6F8F-4903-9363-E56DFF5220A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBEA11C1-6F8F-4903-9363-E56DFF5220A5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
