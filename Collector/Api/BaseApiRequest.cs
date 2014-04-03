@@ -20,6 +20,11 @@ namespace Collector.Api
 		protected static int maxRepeats = 10;
 		protected static int baseRepeatInterval = 6000;
 
+		public BaseApiRequest(string BaseUri)
+		{
+			baseUri = BaseUri;
+		}
+
 		public virtual Uri GetUri(string Method)
 		{
 			return GetUri(Method, new NameValueCollection());
@@ -35,12 +40,12 @@ namespace Collector.Api
 			return builder.Uri;
 		}
 
-		public async Task<JObject> ExecuteRequest(string Method)
+		public async Task<JToken> ExecuteRequest(string Method)
 		{
 			return await ExecuteRequest(Method, new NameValueCollection());
 		}
 
-		public async Task<JObject> ExecuteRequest(string Method, NameValueCollection Params)
+		public async Task<JToken> ExecuteRequest(string Method, NameValueCollection Params)
 		{
 			var requestUri = GetUri(Method, Params);
 
@@ -66,7 +71,8 @@ namespace Collector.Api
 
 				if (data != null)
 				{
-					return JObject.Parse(data);
+					var result = JObject.Parse(data);
+					return result["response"];
 				}
 			}
 		}

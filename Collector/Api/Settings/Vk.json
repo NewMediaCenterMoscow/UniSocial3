@@ -4,10 +4,38 @@
 		"params":{
 			"batch_size": 1,
 			"items_max_count": 200,
+			"id_params": ["id"],
 			"request_params": {
 				"test_param1": "test_val1",
 				"test2": "val2",
 			}
 		}
-	}
+	},
+	{
+		"name":"wall.getComments", 
+		"params":{
+			"batch_size": 1,
+			"items_max_count": 99999,
+			"id_params": ["owner_id", "post_id"],
+			"request_params": { "need_likes": "1", }
+		}
+	},
+	{
+		"name":"wall.get", 
+		"params":{
+			"batch_size": 1,
+			"items_max_count": 100,
+			"id_params": ["owner_id", ],
+			"request_params": { "filter": "all", }
+		}
+	},
+	{
+		"name":"users.get", 
+		"params":{
+			"batch_size": 200,
+			"items_max_count": 1,
+			"id_params": ["user_ids", ],
+			"request_params": { "fields": "education,contacts,nickname, screen_name, sex, bdate, city, country, timezone, photo_50, photo_100, photo_200, photo_max, has_mobile", }
+		}
+	},
 ]}

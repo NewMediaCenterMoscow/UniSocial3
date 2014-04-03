@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,5 +12,8 @@ namespace Collector.Interface
 	{
 		Task<T> GetObject<T>(string Method, string Id);
 		Task<T> GetObject<T>(string Method, List<string> Ids);
+
+		IApiSettingsProvider Settings { get; }
+		IApiRequest ApiRequest { get; }
 	}
 }

@@ -27,12 +27,15 @@ namespace Collector.Api.Settings
 				var apiSettings = new ApiSettings();
 				apiSettings.BatchSize = (int)set["params"]["batch_size"];
 				apiSettings.ItemsMaxCount = (int)set["params"]["items_max_count"];
-				apiSettings.Params = new NameValueCollection();
 
-				foreach (JProperty p in set["params"]["request_params"])
-				{
-					apiSettings.Params.Add(p.Name, (string)p.Value);
-				}
+				apiSettings.IdParams = new List<string>();
+				foreach (var idParam in set["params"]["id_params"])
+					apiSettings.IdParams.Add((string)idParam);
+				
+				apiSettings.Params = new NameValueCollection();
+				if (set["params"]["request_params"] != null)
+					foreach (JProperty p in set["params"]["request_params"])
+						apiSettings.Params.Add(p.Name, (string)p.Value);
 
 				settings.Add(method, apiSettings);
 			}

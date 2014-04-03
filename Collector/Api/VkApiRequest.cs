@@ -10,6 +10,8 @@ namespace Collector.Api
 {
 	public class VkApiRequest : BaseApiRequest
 	{
+		static string vkBaseUri = "https://api.vk.com/method/";
+
 		string apiVersion = "5.16";
 		string lang = "ru";
 
@@ -22,9 +24,8 @@ namespace Collector.Api
 		};
 
 		public VkApiRequest()
+			: base(VkApiRequest.vkBaseUri)
 		{
-			baseUri = "https://api.vk.com/method/";
-
 			var settingsAccessToken = ConfigurationManager.AppSettings["vkAccessToken"];
 			if(!String.IsNullOrEmpty(settingsAccessToken))
 				accessToken = settingsAccessToken;

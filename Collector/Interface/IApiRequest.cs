@@ -12,8 +12,8 @@ namespace Collector.Interface
 	{
 		Uri GetUri(string Method);
 		Uri GetUri(string Method, NameValueCollection Params);
-		Task<JObject> ExecuteRequest(string Method);
-		Task<JObject> ExecuteRequest(string Method, NameValueCollection Params);
+		Task<JToken> ExecuteRequest(string Method);
+		Task<JToken> ExecuteRequest(string Method, NameValueCollection Params);
 		Task<T> ExecuteRequest<T>(string Method);
 		Task<T> ExecuteRequest<T>(string Method, NameValueCollection Params);
 	}

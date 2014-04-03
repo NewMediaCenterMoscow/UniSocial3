@@ -22,7 +22,10 @@ namespace Test.Collector
 
 			Assert.AreEqual(1, sett.BatchSize);
 			Assert.AreEqual(200, sett.ItemsMaxCount);
-			Assert.AreEqual(sett.Params["test_param1"], "test_val1");
+			Assert.AreEqual(1, sett.IdParams.Count);
+			Assert.AreEqual("id", sett.IdParams[0]);
+			Assert.AreEqual(2, sett.Params.Count);
+			Assert.AreEqual("test_val1", sett.Params["test_param1"]);
 		}
 	}
 }

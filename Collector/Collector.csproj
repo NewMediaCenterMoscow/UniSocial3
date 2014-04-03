@@ -56,6 +56,7 @@
     <Compile Include="Api\BaseApiRequest.cs" />
     <Compile Include="Api\Settings\ApiSettings.cs" />
     <Compile Include="Api\Settings\ApiSettingsJsonFileProvider.cs" />
+    <Compile Include="Api\VkApi.cs" />
     <Compile Include="Api\VkApiRequest.cs" />
     <Compile Include="Common\DateTimeHelpers.cs" />
     <Compile Include="Common\UnixTimestampToDateTimeConverter.cs" />
@@ -64,6 +65,7 @@
     <Compile Include="Interface\IApiRequest.cs" />
     <Compile Include="Interface\IApiSettingsProvider.cs" />
     <Compile Include="Models\Vk\VKBaseWallObject.cs" />
+    <Compile Include="Models\Vk\VkCityCountry.cs" />
     <Compile Include="Models\Vk\VkComment.cs" />
     <Compile Include="Models\Vk\VkFriends.cs" />
     <Compile Include="Models\Vk\VkGroup.cs" />

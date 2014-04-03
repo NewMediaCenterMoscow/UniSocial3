@@ -12,5 +12,6 @@ namespace Collector.Api.Settings
 		public int BatchSize { get; set; }
 		public int ItemsMaxCount { get; set; }
 		public NameValueCollection Params { get; set; }
+		public List<string> IdParams { get; set; }
 	}
 }

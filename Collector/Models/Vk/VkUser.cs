@@ -38,10 +38,10 @@ namespace Collector.Models.Vk
 		public string BDate { get; set; }
 
 		[JsonProperty("country")]
-		public long Country { get; set; }
+		public VkCityCountry Country { get; set; }
 
 		[JsonProperty("city")]
-		public long City { get; set; }
+		public VkCityCountry City { get; set; }
 
 		[JsonProperty("deactivated")]
 		[JsonConverter(typeof(VkUserDeactivatedConverted))]
