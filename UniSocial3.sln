@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Collector", "Collector\Coll
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Collector", "Test.Collector\Test.Collector.csproj", "{D115C218-8A0D-4920-8E34-B79C35284E1B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{864788BC-6665-4A10-8735-F16F32492063}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{D115C218-8A0D-4920-8E34-B79C35284E1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D115C218-8A0D-4920-8E34-B79C35284E1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D115C218-8A0D-4920-8E34-B79C35284E1B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{864788BC-6665-4A10-8735-F16F32492063}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{864788BC-6665-4A10-8735-F16F32492063}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{864788BC-6665-4A10-8735-F16F32492063}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{864788BC-6665-4A10-8735-F16F32492063}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
