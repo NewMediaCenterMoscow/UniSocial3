@@ -10,8 +10,8 @@ namespace Collector.Interface
 {
 	public interface IApi
 	{
-		Task<T> GetObject<T>(string Method, string Id);
-		Task<T> GetObject<T>(string Method, List<string> Ids);
+		Task<T> Get<T>(string Method, string Id);
+		Task<T> Get<T>(string Method, List<string> Ids);
 
 		IApiSettingsProvider Settings { get; }
 		IApiRequest ApiRequest { get; }

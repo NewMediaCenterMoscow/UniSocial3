@@ -18,7 +18,7 @@ namespace Test.Collector
 			var settProv= new ApiSettingsJsonFileProvider("Api/Settings/Vk.json");
 			IApi api = new VkApi(settProv);
 
-			var result = await api.GetObject<List<VkUser>>("users.get", "1");
+			var result = await api.Get<List<VkUser>>("users.get", "1");
 
 			Assert.AreEqual(1, result.Count);
 			Assert.AreEqual(1, result[0].Id);
@@ -31,7 +31,7 @@ namespace Test.Collector
 			var settProv = new ApiSettingsJsonFileProvider("Api/Settings/Vk.json");
 			IApi api = new VkApi(settProv);
 
-			var result = await api.GetObject<List<VkUser>>("users.get", new List<string>() { "1", "6" });
+			var result = await api.Get<List<VkUser>>("users.get", new List<string>() { "1", "6" });
 
 			Assert.AreEqual(2, result.Count);
 			Assert.AreEqual(1, result[0].Id);
@@ -46,7 +46,7 @@ namespace Test.Collector
 			var settProv = new ApiSettingsJsonFileProvider("Api/Settings/Vk.json");
 			IApi api = new VkApi(settProv);
 
-			var result = await api.GetObject<VkList<VkPost>>("wall.get", "174111803");
+			var result = await api.Get<VkList<VkPost>>("wall.get", "174111803");
 
 			Assert.AreEqual(305, result.Count);
 			Assert.AreEqual(305, result.Items.Count);

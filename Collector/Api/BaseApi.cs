@@ -25,10 +25,10 @@ namespace Collector.Api
 			this.Settings = ApiSettingsProvider;
 		}
 
-		NameValueCollection getIdParam(ApiSettings settings, string id)
-		{
-			var param = new NameValueCollection();
+		protected abstract void setListParams(NameValueCollection param, long offset, long count);
 
+		protected void setIdParam(NameValueCollection param, ApiSettings settings, string id)
+		{
 			if (settings.IdParams.Count == 1)
 			{
 				param.Add(settings.IdParams[0], id);
@@ -41,33 +41,91 @@ namespace Collector.Api
 					param.Add(settings.IdParams[i], ids[i]);
 				}
 			}
-
-			return param;
 		}
 
-		public async Task<T> GetObject<T>(string Method, string Id)
+		protected bool isNeedList(Type t)
 		{
-			// Workflow:
-			// 1. Create params [Ok]
-			// 2. Set id param [Ok]
-			// 3. Exucte request [Ok]
-			// 4. Modify result
+			var apiListType = typeof(IApiList<>);
 
+			var result = 
+				t.GetInterfaces().Any(
+					it => it.IsGenericType && it.GetGenericTypeDefinition() == apiListType
+				);
+			
+			return result;
+		}
+
+		protected async Task<T> getList<T>(string Method, NameValueCollection param, ApiSettings settings)
+		{
+			var maxCount = settings.ItemsMaxCount;
+
+			var currentOffset = 0L;
+			var currentCount = 0L;
+			T resultList = default(T);
+
+			while (true)
+			{
+				setListParams(param, currentOffset, maxCount);
+
+				var curentResult = await ApiRequest.ExecuteRequest<T>(Method, param);
+
+				if (curentResult != null)
+				{
+					if (resultList == null)
+					{
+						resultList = curentResult;
+					}
+					else
+					{
+						(resultList as IApiList<T>).AppendItems(curentResult as IApiList<T>);
+					}
+
+					currentCount = (curentResult as IApiList<T>).GetObjectCount();
+
+					if (currentCount < maxCount)
+					{
+						break;
+					}
+
+					currentOffset += currentCount;
+				}
+				else
+				{
+					break;
+				}
+			}
+
+			return resultList;
+		}
+
+		public async Task<T> Get<T>(string Method, string Id)
+		{
 			var settings = Settings.GetSettingsForMethod(Method);
 
-			var param = getIdParam(settings, Id);
+			var param = new NameValueCollection();
+
+			setIdParam(param, settings, Id);
 			param.Add(settings.Params);
 
-			var result = await ApiRequest.ExecuteRequest<T>(Method, param);
+			T result = default(T);
+
+			if (isNeedList(typeof(T)))
+			{
+				result = await getList<T>(Method, param, settings);
+			}
+			else
+			{
+				result = await ApiRequest.ExecuteRequest<T>(Method, param);
+			}
 
 			return result;
 		}
-		public async Task<T> GetObject<T>(string Method, List<string> Ids)
+
+		public async Task<T> Get<T>(string Method, List<string> Ids)
 		{
 			var allIds = String.Join(",", Ids);
 
-			return await GetObject<T>(Method, allIds);
+			return await Get<T>(Method, allIds);
 		}
-
 	}
 }

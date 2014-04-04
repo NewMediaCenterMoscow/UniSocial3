@@ -62,6 +62,7 @@
     <Compile Include="Common\UnixTimestampToDateTimeConverter.cs" />
     <Compile Include="Common\VkUserDeactivatedConverted.cs" />
     <Compile Include="Interface\IApi.cs" />
+    <Compile Include="Interface\IApiList.cs" />
     <Compile Include="Interface\IApiRequest.cs" />
     <Compile Include="Interface\IApiSettingsProvider.cs" />
     <Compile Include="Models\Vk\VKBaseWallObject.cs" />
