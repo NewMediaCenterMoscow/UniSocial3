@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace Common
 {
-	public class CollectTask
+	public class ApiHelper
 	{
-		public string SocialNetwork { get; set; }
-		public string Method { get; set; }
-		public string Params { get; set; }
+
 	}
 }

@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Collector", "Test.Coll
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{864788BC-6665-4A10-8735-F16F32492063}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CmdConrtoller", "CmdConrtoller\CmdConrtoller.csproj", "{E793B447-F9F9-412D-AB51-AD698FA63E4F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{864788BC-6665-4A10-8735-F16F32492063}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{864788BC-6665-4A10-8735-F16F32492063}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{864788BC-6665-4A10-8735-F16F32492063}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E793B447-F9F9-412D-AB51-AD698FA63E4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E793B447-F9F9-412D-AB51-AD698FA63E4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E793B447-F9F9-412D-AB51-AD698FA63E4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E793B447-F9F9-412D-AB51-AD698FA63E4F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

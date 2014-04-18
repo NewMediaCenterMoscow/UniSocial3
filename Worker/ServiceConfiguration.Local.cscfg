@@ -5,6 +5,8 @@
     <ConfigurationSettings>
       <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="UseDevelopmentStorage=true" />
       <Setting name="StorageConnectionString" value="UseDevelopmentStorage=true" />
+      <Setting name="tasksQueueName" value="tasks" />
+      <Setting name="resultsQueueName" value="results" />
     </ConfigurationSettings>
   </Role>
 </ServiceConfiguration>
