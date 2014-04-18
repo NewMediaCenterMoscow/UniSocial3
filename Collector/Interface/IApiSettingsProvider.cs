@@ -10,5 +10,7 @@ namespace Collector.Interface
 	public interface IApiSettingsProvider
 	{
 		ApiSettings GetSettingsForMethod(string Method);
+		List<string> GetSupportedMethods();
+		bool IsMethodSupported(string Method);
 	}
 }

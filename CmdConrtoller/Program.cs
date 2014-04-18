@@ -43,13 +43,16 @@ namespace CmdConrtoller
 			// Send simple task
 
 			var task = new CollectTask();
-			task.SocialNetwork = "vkontakte";
+			task.SocialNetwork = SocialNetwork.VKontakte;
 			task.Method = "users.get";
 			task.Params = "1,6";
 
 			var messageString = JsonConvert.SerializeObject(task);
 
 			CloudQueueMessage message = new CloudQueueMessage(messageString);
+
+
+
 			queue.AddMessage(message);
 
 		}

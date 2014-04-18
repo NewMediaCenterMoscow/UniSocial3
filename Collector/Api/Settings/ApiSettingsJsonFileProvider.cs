@@ -13,7 +13,6 @@ namespace Collector.Api.Settings
 	public class ApiSettingsJsonFileProvider : IApiSettingsProvider
 	{
 		Dictionary<string, ApiSettings> settings;
-		
 
 		public ApiSettingsJsonFileProvider(string Filename)
 		{
@@ -43,7 +42,25 @@ namespace Collector.Api.Settings
 
 		public ApiSettings GetSettingsForMethod(string Method)
 		{
-			return settings[Method];
+			if (settings.ContainsKey(Method))
+			{
+				return settings[Method];
+			}
+			else
+			{
+				throw new NotSupportedException("Not supported: " + Method);
+			}
+		}
+
+
+		public List<string> GetSupportedMethods()
+		{
+			return settings.Keys.ToList();
+		}
+
+		public bool IsMethodSupported(string Method)
+		{
+			return settings.ContainsKey(Method);
 		}
 	}
 }

@@ -43,6 +43,12 @@
     <Compile Include="CollectTask.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Collector\Collector.csproj">
+      <Project>{dbea11c1-6f8f-4903-9363-e56dff5220a5}</Project>
+      <Name>Collector</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

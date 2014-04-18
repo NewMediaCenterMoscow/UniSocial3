@@ -6,10 +6,22 @@ using System.Threading.Tasks;
 
 namespace Common
 {
+	public enum SocialNetwork
+	{
+ 		VKontakte,
+		Facebook,
+		Twitter
+	}
+
 	public class CollectTask
 	{
-		public string SocialNetwork { get; set; }
+		public SocialNetwork SocialNetwork { get; set; }
 		public string Method { get; set; }
 		public string Params { get; set; }
+
+		public override string ToString()
+		{
+			return "[" + SocialNetwork + "] " + Method;
+		}
 	}
 }
