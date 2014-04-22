@@ -13,5 +13,6 @@ namespace Collector.Api.Settings
 		public int ItemsMaxCount { get; set; }
 		public NameValueCollection Params { get; set; }
 		public List<string> IdParams { get; set; }
+		public bool IsNeedAccessToken { get; set; }
 	}
 }

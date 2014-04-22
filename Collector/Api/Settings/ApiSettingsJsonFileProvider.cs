@@ -26,6 +26,7 @@ namespace Collector.Api.Settings
 				var apiSettings = new ApiSettings();
 				apiSettings.BatchSize = (int)set["params"]["batch_size"];
 				apiSettings.ItemsMaxCount = (int)set["params"]["items_max_count"];
+				apiSettings.IsNeedAccessToken = (bool)set["params"]["is_need_access_toke"];
 
 				apiSettings.IdParams = new List<string>();
 				foreach (var idParam in set["params"]["id_params"])

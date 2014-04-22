@@ -1,41 +1,92 @@
 ﻿{"settings":[
-	{
-		"name":"test_method", 
-		"params":{
+    {
+		"name":"groups.getById", 
+		"params": {
+			"batch_size": 300,
+			"items_max_count": 1,
+			"id_params": ["group_ids" ],
+			"is_need_access_toke": false,
+			"request_params": { "fields": "members_count" }
+		}
+	},
+    {
+		"name":"groups.getMembers", 
+		"params": {
+			"batch_size": 1,
+			"items_max_count": 1000,
+			"id_params": ["group_id" ],
+			"is_need_access_toke": false,
+			"request_params": {  }
+		}
+	}, 
+    {
+		"name":"groups.get", 
+		"params": {
+			"batch_size": 1,
+			"items_max_count": 1000,
+			"id_params": ["user_id" ],
+			"is_need_access_toke": true,
+			"request_params": {  }
+		}
+	},
+    {
+		"name":"users.get", 
+		"params": {
+			"batch_size": 1000,
+			"items_max_count": 1,
+			"id_params": ["user_ids" ],
+			"is_need_access_toke": false,
+			"request_params": { "fields": "education,contacts,nickname, screen_name, sex, bdate, city, country, timezone, photo_50, photo_100, photo_200, photo_max, has_mobile" }
+		}
+	},
+    {
+		"name":"users.getSubscriptions", 
+		"params": {
 			"batch_size": 1,
 			"items_max_count": 200,
-			"id_params": ["id"],
-			"request_params": {
-				"test_param1": "test_val1",
-				"test2": "val2",
-			}
+			"id_params": ["user_id" ],
+			"is_need_access_toke": false,
+			"request_params": {  }
 		}
 	},
-	{
-		"name":"wall.getComments", 
-		"params":{
-			"batch_size": 1,
-			"items_max_count": 99999,
-			"id_params": ["owner_id", "post_id"],
-			"request_params": { "need_likes": "1", }
-		}
-	},
-	{
+    {
 		"name":"wall.get", 
-		"params":{
+		"params": {
 			"batch_size": 1,
 			"items_max_count": 100,
-			"id_params": ["owner_id", ],
-			"request_params": { "filter": "all", }
+			"id_params": ["owner_id"],
+			"is_need_access_toke": false,
+			"request_params": { "filter": "all" }
+		}
+	}, 
+    {
+		"name":"wall.getComments", 
+		"params": {
+			"batch_size": 1,
+			"items_max_count": 100,
+			"id_params": ["owner_id", "post_id"],
+			"is_need_access_toke": false,
+			"request_params": { "need_likes": "1" }
 		}
 	},
-	{
-		"name":"users.get", 
-		"params":{
-			"batch_size": 200,
-			"items_max_count": 1,
-			"id_params": ["user_ids", ],
-			"request_params": { "fields": "education,contacts,nickname, screen_name, sex, bdate, city, country, timezone, photo_50, photo_100, photo_200, photo_max, has_mobile", }
+    {
+		"name":"wall.getReposts", 
+		"params": {
+			"batch_size": 1,
+			"items_max_count": 1000,
+			"id_params": ["owner_id", "post_id"],
+			"is_need_access_toke": false,
+			"request_params": {  }
 		}
 	},
+    {
+		"name":"friends.get", 
+		"params": {
+			"batch_size": 1,
+			"items_max_count": 99999,
+			"id_params": ["user_id"],
+			"is_need_access_toke": false,
+			"request_params": {  }
+		}
+	}
 ]}

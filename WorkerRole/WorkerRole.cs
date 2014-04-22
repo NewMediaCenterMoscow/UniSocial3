@@ -123,6 +123,8 @@ namespace WorkerRole
 
 			var result = await apiHelper.GetResult(collectTask);
 
+			var str = result.ToString();
+
 			// Delete message
 			taskQueue.DeleteMessage(message);
 		}

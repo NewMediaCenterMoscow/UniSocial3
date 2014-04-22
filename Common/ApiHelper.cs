@@ -54,9 +54,7 @@ namespace Common
 			var key = (int)socialNetwork + method;
 
 			if (!apiCalls.ContainsKey(key))
-			{
 				throw new NotSupportedException("Not supported: " + socialNetwork + " - " + method);
-			}
 
 			return apiCalls[key];
 		}

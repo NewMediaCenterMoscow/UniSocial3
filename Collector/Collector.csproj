@@ -68,16 +68,12 @@
     <Compile Include="Models\Vk\VKBaseWallObject.cs" />
     <Compile Include="Models\Vk\VkCityCountry.cs" />
     <Compile Include="Models\Vk\VkComment.cs" />
-    <Compile Include="Models\Vk\VkFriends.cs" />
     <Compile Include="Models\Vk\VkGroup.cs" />
-    <Compile Include="Models\Vk\VkGroupMembers.cs" />
     <Compile Include="Models\Vk\VkList.cs" />
     <Compile Include="Models\Vk\VkNestedCount.cs" />
     <Compile Include="Models\Vk\VkPost.cs" />
     <Compile Include="Models\Vk\VkUser.cs" />
-    <Compile Include="Models\Vk\VkUserGroups.cs" />
     <Compile Include="Models\Vk\VkUserSubscriptions.cs" />
-    <Compile Include="Models\Vk\VkWallComments.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

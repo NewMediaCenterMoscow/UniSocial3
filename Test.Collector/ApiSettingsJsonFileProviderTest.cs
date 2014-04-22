@@ -18,14 +18,15 @@ namespace Test.Collector
 		{
 			var sp = new ApiSettingsJsonFileProvider("Api/Settings/Vk.json");
 
-			var sett = sp.GetSettingsForMethod("test_method");
+			var sett = sp.GetSettingsForMethod("groups.getById");
 
-			Assert.AreEqual(1, sett.BatchSize);
-			Assert.AreEqual(200, sett.ItemsMaxCount);
+			Assert.AreEqual(300, sett.BatchSize);
+			Assert.AreEqual(1, sett.ItemsMaxCount);
 			Assert.AreEqual(1, sett.IdParams.Count);
-			Assert.AreEqual("id", sett.IdParams[0]);
-			Assert.AreEqual(2, sett.Params.Count);
-			Assert.AreEqual("test_val1", sett.Params["test_param1"]);
+			Assert.AreEqual("group_ids", sett.IdParams[0]);
+			Assert.AreEqual(1, sett.Params.Count);
+			Assert.AreEqual("members_count", sett.Params["fields"]);
+			Assert.AreEqual(false, sett.IsNeedAccessToken);
 		}
 	}
 }

@@ -9,8 +9,6 @@ namespace Collector.Models.Vk
 {
 	public class VkUserSubscriptions
 	{
-		public long Id { get; set; }
-
 		[JsonProperty("users")]
 		public VkList<long> Users { get; set; }
 
