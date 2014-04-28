@@ -12,6 +12,7 @@ using Microsoft.WindowsAzure.Storage.Queue;
 using Newtonsoft.Json;
 using Common;
 using System.Threading.Tasks;
+using Common.ApiHelper;
 
 namespace WorkerRole
 {
@@ -37,7 +38,7 @@ namespace WorkerRole
 			// This is a sample worker implementation. Replace with your logic.
 			Trace.TraceInformation("WorkerRole entry point called", "Information");
 
-			RunAsync().Wait();
+			RunAsync(); // Sync, in fact
 		}
 
 		public override bool OnStart()
@@ -62,14 +63,13 @@ namespace WorkerRole
 			base.OnStop();
 		}
 
-		public async Task RunAsync()
+		public void RunAsync()
 		{
 			while (!isStopped)
 			{
-
 				// Get messages
 				var messages = taskQueue.GetMessages(messagePerOneRequest);
-				await processMessages(messages);
+				processMessages(messages);
 
 				Trace.TraceInformation("Working", "Information");
 				if (sleepInterval != 0)
@@ -105,15 +105,15 @@ namespace WorkerRole
 		}
 
 
-		private async Task processMessages(IEnumerable<CloudQueueMessage> messages)
+		private void processMessages(IEnumerable<CloudQueueMessage> messages)
 		{
 			foreach (var msg in messages)
 			{
-				await processMessage(msg);
+				processMessage(msg);
 			}
 		}
 
-		private async Task processMessage(CloudQueueMessage message)
+		private void processMessage(CloudQueueMessage message)
 		{
 			// Get message content
 			var content = message.AsString;
@@ -121,7 +121,7 @@ namespace WorkerRole
 
 			Trace.TraceInformation("Get message: " + collectTask.ToString(), "Information");
 
-			var result = await apiHelper.GetResult(collectTask);
+			var result = apiHelper.GetResult(collectTask);
 
 			var str = result.ToString();
 

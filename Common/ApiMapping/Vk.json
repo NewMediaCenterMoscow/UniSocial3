@@ -1,0 +1,39 @@
+﻿{
+    "methods":[
+	{
+	    "name":"groups.getById", 
+		"type": "List<VkGroup>"
+	},
+    {
+		"name":"groups.getMembers", 
+		"type": "VkList<long>"
+	}, 
+    {
+		"name":"groups.get", 
+		"type": "VkList<long>"
+	},
+    {
+		"name":"users.get", 
+		"type": "List<VkUser>"
+	},
+    {
+		"name":"users.getSubscriptions", 
+		"type": "VkUserSubscriptions"
+	},
+    {
+		"name":"wall.get", 
+		"type": "VkList<VkPost>"
+	}, 
+    {
+		"name":"wall.getComments", 
+		"type": "VkList<VkComment>"
+	},
+    {
+		"name":"wall.getReposts", 
+		"type": "VkList<VkPost>"
+	},
+    {
+		"name":"friends.get", 
+		"type": "VkList<long>"
+	}
+]}

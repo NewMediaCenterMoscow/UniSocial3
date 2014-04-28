@@ -11,16 +11,10 @@ namespace Collector.Api
 {
 	public class VkApi : BaseApi
 	{
-		public VkApi(IApiSettingsProvider ApiSettingsProvider)
-			: base(new VkApiRequest(), ApiSettingsProvider)
+		public VkApi(IApiRequest ApiRequest, IApiSettingsProvider ApiSettingsProvider)
+			: base(ApiRequest, ApiSettingsProvider)
 		{
  
-		}
-
-		protected override void setListParams(NameValueCollection param, long offset, long count)
-		{
-			param.Set("offset", offset.ToString());
-			param.Set("count", count.ToString());
 		}
 	}
 }

@@ -13,14 +13,21 @@ namespace Collector.Api.Settings
 	public class ApiSettingsJsonFileProvider : IApiSettingsProvider
 	{
 		Dictionary<string, ApiSettings> settings;
+		Tuple<string, string> listParams;
 
 		public ApiSettingsJsonFileProvider(string Filename)
 		{
 			var json = File.ReadAllText(Filename);
 			var jsonSettings = JObject.Parse(json);
 
+			// Set list params
+			var listOffsetParam = (string)jsonSettings["list_params"]["offset"];
+			var listCountParam = (string)jsonSettings["list_params"]["count"];
+			listParams = new Tuple<string, string>(listOffsetParam, listCountParam);
+
+			// Set settings for methods
 			settings = new Dictionary<string, ApiSettings>();
-			foreach (var set in jsonSettings["settings"])
+			foreach (var set in jsonSettings["methods"])
 			{
 				var method = (string)set["name"];
 				var apiSettings = new ApiSettings();
@@ -62,6 +69,10 @@ namespace Collector.Api.Settings
 		public bool IsMethodSupported(string Method)
 		{
 			return settings.ContainsKey(Method);
+		}
+		public Tuple<string, string> GetListOffsetParams()
+		{
+			return listParams;
 		}
 	}
 }

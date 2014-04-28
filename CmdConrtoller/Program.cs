@@ -1,4 +1,5 @@
 ﻿using Common;
+using Common.ApiHelper;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Queue;
 using Newtonsoft.Json;
@@ -17,6 +18,29 @@ namespace CmdConrtoller
 		static string tasksQueueName;
 		static string resultsQueueName;
 
+
+		static void Main(string[] args)
+		{
+			//sendMessageToQueue();
+
+			var apiHelper = new ApiHelper();
+			
+			var task = new CollectTask();
+			task.SocialNetwork = SocialNetwork.VKontakte;
+			task.Method = "users.get";
+			task.Params = "1,6";
+
+			try
+			{
+				var result = apiHelper.GetResult(task);
+
+			}
+			catch (Exception ex)
+			{
+				throw;
+			}
+		}
+
 		static void configureQueue()
 		{
 			storageConnStr = ConfigurationManager.ConnectionStrings["StorageConnectionString"].ConnectionString;
@@ -24,7 +48,7 @@ namespace CmdConrtoller
 			resultsQueueName = ConfigurationManager.AppSettings["resultsQueueName"];
 		}
 
-		static void Main(string[] args)
+		private static void sendMessageToQueue()
 		{
 			configureQueue();
 

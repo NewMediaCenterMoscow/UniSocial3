@@ -1,4 +1,9 @@
-﻿{"settings":[
+﻿{
+    "list_params": {
+        "offset":"offset",
+        "count": "count"
+    },
+    "methods": [
     {
 		"name":"groups.getById", 
 		"params": {

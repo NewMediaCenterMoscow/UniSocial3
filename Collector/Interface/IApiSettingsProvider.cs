@@ -12,5 +12,6 @@ namespace Collector.Interface
 		ApiSettings GetSettingsForMethod(string Method);
 		List<string> GetSupportedMethods();
 		bool IsMethodSupported(string Method);
+		Tuple<string, string> GetListOffsetParams();
 	}
 }

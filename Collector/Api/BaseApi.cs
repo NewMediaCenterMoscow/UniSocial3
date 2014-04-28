@@ -25,8 +25,13 @@ namespace Collector.Api
 			this.Settings = ApiSettingsProvider;
 		}
 
-		protected abstract void setListParams(NameValueCollection param, long offset, long count);
+		protected void setListParams(NameValueCollection param, long offset, long count)
+		{
+			var listParam = Settings.GetListOffsetParams();
 
+			param.Set(listParam.Item1, offset.ToString());
+			param.Set(listParam.Item2, count.ToString());
+		}
 		protected void setIdParam(NameValueCollection param, ApiSettings settings, string id)
 		{
 			if (settings.IdParams.Count == 1)
@@ -43,16 +48,19 @@ namespace Collector.Api
 			}
 		}
 
-		protected bool isNeedList(Type t)
+		//protected bool isNeedList(Type t)
+		protected bool isNeedList(ApiSettings settings)
 		{
-			var apiListType = typeof(IApiList<>);
+			//var apiListType = typeof(IApiList<>);
 
-			var result = 
-				t.GetInterfaces().Any(
-					it => it.IsGenericType && it.GetGenericTypeDefinition() == apiListType
-				);
+			//var result = 
+			//	t.GetInterfaces().Any(
+			//		it => it.IsGenericType && it.GetGenericTypeDefinition() == apiListType
+			//	);
 			
-			return result;
+			//return result;
+
+			return settings.ItemsMaxCount != 1;
 		}
 
 		protected async Task<T> getList<T>(string Method, NameValueCollection param, ApiSettings settings)
@@ -109,7 +117,7 @@ namespace Collector.Api
 
 			T result = default(T);
 
-			if (isNeedList(typeof(T)))
+			if (isNeedList(settings))
 			{
 				result = await getList<T>(Method, param, settings);
 			}

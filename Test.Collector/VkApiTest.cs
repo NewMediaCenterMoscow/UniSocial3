@@ -16,7 +16,8 @@ namespace Test.Collector
 		public async Task TestGetObjectOneObject()
 		{
 			var settProv= new ApiSettingsJsonFileProvider("Api/Settings/Vk.json");
-			IApi api = new VkApi(settProv);
+			var apiRequest = new VkApiRequest();
+			IApi api = new VkApi(apiRequest, settProv);
 
 			var result = await api.Get<List<VkUser>>("users.get", "1");
 
@@ -29,7 +30,8 @@ namespace Test.Collector
 		public async Task TestGetObjectMultipleObject()
 		{
 			var settProv = new ApiSettingsJsonFileProvider("Api/Settings/Vk.json");
-			IApi api = new VkApi(settProv);
+			var apiRequest = new VkApiRequest();
+			IApi api = new VkApi(apiRequest, settProv);
 
 			var result = await api.Get<List<VkUser>>("users.get", new List<string>() { "1", "6" });
 
@@ -44,7 +46,8 @@ namespace Test.Collector
 		public async Task TestGetObjectVkList()
 		{
 			var settProv = new ApiSettingsJsonFileProvider("Api/Settings/Vk.json");
-			IApi api = new VkApi(settProv);
+			var apiRequest = new VkApiRequest();
+			IApi api = new VkApi(apiRequest, settProv);
 
 			var result = await api.Get<VkList<VkPost>>("wall.get", "174111803");
 
