@@ -1,5 +1,5 @@
 ﻿using Common;
-using Common.ApiHelper;
+using Common.Model;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Queue;
 using Newtonsoft.Json;
@@ -21,19 +21,23 @@ namespace CmdConrtoller
 
 		static void Main(string[] args)
 		{
-			//sendMessageToQueue();
+			sendMessageToQueue();
 
+			//testApiHelper();
+		}
+
+		private static void testApiHelper()
+		{
 			var apiHelper = new ApiHelper();
-			
+
 			var task = new CollectTask();
 			task.SocialNetwork = SocialNetwork.VKontakte;
-			task.Method = "users.get";
-			task.Params = "1,6";
+			task.Method = "groups.getMembers";
+			task.Params = "1";
 
 			try
 			{
 				var result = apiHelper.GetResult(task);
-
 			}
 			catch (Exception ex)
 			{
@@ -68,8 +72,8 @@ namespace CmdConrtoller
 
 			var task = new CollectTask();
 			task.SocialNetwork = SocialNetwork.VKontakte;
-			task.Method = "users.get";
-			task.Params = "1,6";
+			task.Method = "groups.getMembers";
+			task.Params = "1";
 
 			var messageString = JsonConvert.SerializeObject(task);
 

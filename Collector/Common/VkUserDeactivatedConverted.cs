@@ -20,7 +20,7 @@ namespace Collector.Common
 		{
 			var value = (string)reader.Value;
 
-			if (value == "deleted" || value == "banned")
+			if (value == "deleted" || value == "banned" || value == "true")
 				return true;
 			else
 				return false;
@@ -28,7 +28,7 @@ namespace Collector.Common
 
 		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
 		{
-			throw new NotImplementedException();
+			writer.WriteValue(value.ToString().ToLower());
 		}
 	}
 }

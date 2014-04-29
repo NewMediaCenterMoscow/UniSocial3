@@ -37,6 +37,14 @@
     <ServiceConfiguration Include="ServiceConfiguration.Cloud.cscfg" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DbWriterRole\DbWriterRole.csproj">
+      <Name>DbWriterRole</Name>
+      <Project>{e0b6e7eb-8992-4826-9f7a-d8f85e91a274}</Project>
+      <Private>True</Private>
+      <RoleType>Worker</RoleType>
+      <RoleName>DbWriterRole</RoleName>
+      <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
+    </ProjectReference>
     <ProjectReference Include="..\WorkerRole\WorkerRole.csproj">
       <Name>WorkerRole</Name>
       <Project>{b29137bb-979a-42c4-9d1c-10980484c832}</Project>
@@ -47,9 +55,13 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="DbWriterRoleContent\" />
     <Folder Include="WorkerRoleContent\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="DbWriterRoleContent\diagnostics.wadcfg">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="WorkerRoleContent\diagnostics.wadcfg">
       <SubType>Content</SubType>
     </Content>

@@ -9,4 +9,10 @@
       <Setting name="resultsQueueName" value="results" />
     </ConfigurationSettings>
   </Role>
+  <Role name="DbWriterRole">
+    <Instances count="1" />
+    <ConfigurationSettings>
+      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="UseDevelopmentStorage=true" />
+    </ConfigurationSettings>
+  </Role>
 </ServiceConfiguration>

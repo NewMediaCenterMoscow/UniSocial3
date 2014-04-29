@@ -3,6 +3,7 @@ using Collector.Api.Settings;
 using Collector.Interface;
 using Collector.Models.Vk;
 using Common.ApiMapping;
+using Common.Model;
 using Ninject;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Common.ApiHelper
+namespace Common
 {
 	public class ApiHelper
 	{
@@ -32,13 +33,6 @@ namespace Common.ApiHelper
 			setApiParams();
 		}
 
-		//public async Task<object> GetResult(CollectTask task)
-		//{
-		//	var apiCall = getApiCall(task.SocialNetwork, task.Method);
-		//	var result = await apiCall(task.Params);
-
-		//	return result;
-		//}
 		public object GetResult(CollectTask task)
 		{
 			var apiCall = getApiCall(task.SocialNetwork, task.Method);
@@ -51,21 +45,6 @@ namespace Common.ApiHelper
 		void setApiParams()
 		{
 			apiCalls = new Dictionary<string, Func<string, object>>();
-
-			//// Vk
-			//var apiVk = ninjectKernels[SocialNetwork.VKontakte].Get<IApi>();
-			//addApiCall(SocialNetwork.VKontakte, "groups.getById", async param =>
-			//{
-			//	return await apiVk.Get<List<VkGroup>>("groups.getById", param.Split(',').ToList());
-			//});
-			//addApiCall(SocialNetwork.VKontakte, "groups.getMembers", async param =>
-			//{
-			//	return await apiVk.Get<VkList<long>>("groups.getMembers", param);
-			//});
-			//addApiCall(SocialNetwork.VKontakte, "users.get", async param =>
-			//{
-			//	return await apiVk.Get<List<VkUser>>("users.get", param.Split(',').ToList());
-			//});
 
 			setApiParams(SocialNetwork.VKontakte);
 		}
