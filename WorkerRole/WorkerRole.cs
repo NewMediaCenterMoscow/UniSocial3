@@ -40,8 +40,10 @@ namespace WorkerRole
 				RoleEnvironment.GetConfigurationSettingValue("tasksQueueName");
 			var resultsQueueName =
 				RoleEnvironment.GetConfigurationSettingValue("resultsQueueName");
+			var containerName =
+				RoleEnvironment.GetConfigurationSettingValue("resultQueueContainerName");
 
-			worker = new DataCollectWorker(storageConnStr, tasksQueueName, resultsQueueName);
+			worker = new DataCollectWorker(storageConnStr, tasksQueueName, resultsQueueName, containerName);
 			worker.Initialize();
 
 			return base.OnStart();

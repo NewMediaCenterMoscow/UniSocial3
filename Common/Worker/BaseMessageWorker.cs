@@ -12,6 +12,7 @@ namespace Common.Worker
 {
 	public class BaseMessageWorker
 	{
+		protected CloudStorageAccount storageAccount;
 		protected string storageConnStr;
 		protected string queueName;
 		protected CloudQueueClient queueClient;
@@ -22,15 +23,10 @@ namespace Common.Worker
 		protected CancellationTokenSource cancelTokenSource;
 		protected ParallelOptions processMessageParallerOptions;
 
-		public BaseMessageWorker(string StorageQueueConnectionString, string QueueName)
+		public BaseMessageWorker(string StorageConnectionString, string QueueName)
 		{
-			storageConnStr = StorageQueueConnectionString;
+			storageConnStr = StorageConnectionString;
 			queueName = QueueName;
-		}
-
-		public void Initialize()
-		{
-			configureQueue();
 		}
 
 		public void Stop()
@@ -49,18 +45,22 @@ namespace Common.Worker
 			task.Wait();
 		}
 
-
-		protected virtual CloudQueueClient createQueueClient(string storageConnStr)
+		public virtual void Initialize()
 		{
 			// Retrieve storage account from connection string
-			CloudStorageAccount storageAccount = CloudStorageAccount.Parse(storageConnStr);
+			this.storageAccount = CloudStorageAccount.Parse(this.storageConnStr);
 
-			// Create the queue client
-			var client = storageAccount.CreateCloudQueueClient();
-
-			return client;
+			configureQueue(this.storageAccount);
 		}
 
+		protected virtual void configureQueue(CloudStorageAccount storageAccount)
+		{
+			// Create the queue client
+			this.queueClient = storageAccount.CreateCloudQueueClient();
+
+			this.queue = createQueue(this.queueClient, this.queueName);
+		}
+		
 		protected virtual CloudQueue createQueue(CloudQueueClient client, string queueName)
 		{
 			// Retrieve a reference to a queues
@@ -70,12 +70,6 @@ namespace Common.Worker
 			queue.CreateIfNotExists();
 
 			return queue;
-		}
-
-		protected virtual void configureQueue()
-		{
-			this.queueClient = createQueueClient(this.storageConnStr);
-			this.queue = createQueue(this.queueClient, this.queueName);
 		}
 
 		protected virtual void workCycle(CancellationToken cancelToken)

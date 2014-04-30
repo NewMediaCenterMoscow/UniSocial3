@@ -85,6 +85,7 @@
     <Compile Include="Model\CollectTaskResult.cs" />
     <Compile Include="NinjectModules\Vk.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Worker\BaseMessageBlobWorker.cs" />
     <Compile Include="Worker\BaseMessageWorker.cs" />
     <Compile Include="Worker\DataCollectWorker.cs" />
     <Compile Include="Worker\DbWriterWorker.cs" />

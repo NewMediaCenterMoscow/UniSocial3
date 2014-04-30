@@ -1,5 +1,6 @@
 ﻿using Common;
 using Common.Model;
+using Common.Worker;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Queue;
 using Newtonsoft.Json;
@@ -22,28 +23,8 @@ namespace CmdConrtoller
 		static void Main(string[] args)
 		{
 			sendMessageToQueue();
-
-			//testApiHelper();
 		}
 
-		private static void testApiHelper()
-		{
-			var apiHelper = new ApiHelper();
-
-			var task = new CollectTask();
-			task.SocialNetwork = SocialNetwork.VKontakte;
-			task.Method = "groups.getMembers";
-			task.Params = "1";
-
-			try
-			{
-				var result = apiHelper.GetResult(task);
-			}
-			catch (Exception ex)
-			{
-				throw;
-			}
-		}
 
 		static void configureQueue()
 		{
@@ -74,12 +55,12 @@ namespace CmdConrtoller
 			task.SocialNetwork = SocialNetwork.VKontakte;
 			task.Method = "groups.getMembers";
 			task.Params = "1";
-
 			var messageString = JsonConvert.SerializeObject(task);
 
-			CloudQueueMessage message = new CloudQueueMessage(messageString);
+			var cbMesage = CloudQueueBlobMessage.CreateMessageWithContent(messageString);
+			var cmMessageString = JsonConvert.SerializeObject(cbMesage);
 
-
+			CloudQueueMessage message = new CloudQueueMessage(cmMessageString);
 
 			queue.AddMessage(message);
 

@@ -33,8 +33,10 @@ namespace DbWriterRole
 				RoleEnvironment.GetConfigurationSettingValue("StorageConnectionString");
 			var resultsQueueName =
 				RoleEnvironment.GetConfigurationSettingValue("resultsQueueName");
+			var containerName =
+				RoleEnvironment.GetConfigurationSettingValue("resultQueueContainerName");
 
-			worker = new DbWriterWorker(storageConnStr, resultsQueueName);
+			worker = new DbWriterWorker(storageConnStr, resultsQueueName, containerName);
 			worker.Initialize();
 
 			return base.OnStart();

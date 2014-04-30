@@ -7,6 +7,7 @@
       <Setting name="StorageConnectionString" value="UseDevelopmentStorage=true" />
       <Setting name="tasksQueueName" value="tasks" />
       <Setting name="resultsQueueName" value="results" />
+      <Setting name="resultQueueContainerName" value="resultmessages" />
     </ConfigurationSettings>
   </Role>
   <Role name="DbWriterRole">
@@ -16,6 +17,7 @@
       <Setting name="StorageConnectionString" value="UseDevelopmentStorage=true" />
       <Setting name="resultsQueueName" value="results" />
       <Setting name="tasksQueueName" value="tasks" />
+      <Setting name="resultQueueContainerName" value="resultmessages" />
     </ConfigurationSettings>
   </Role>
 </ServiceConfiguration>

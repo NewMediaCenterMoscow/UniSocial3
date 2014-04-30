@@ -9,21 +9,21 @@ using System.Threading.Tasks;
 
 namespace Common.Worker
 {
-	public class DbWriterWorker : BaseMessageWorker
+	public class DbWriterWorker : BaseMessageBlobWorker
 	{
-		public DbWriterWorker(string StorageQueueConnectionString, string QueueName)
-			: base(StorageQueueConnectionString, QueueName)
+		public DbWriterWorker(string StorageQueueConnectionString, string QueueName, string ContainerName)
+			: base(StorageQueueConnectionString, QueueName, ContainerName)
 		{
  
 		}
 
-		protected override void processMessage(Microsoft.WindowsAzure.Storage.Queue.CloudQueueMessage message)
+		protected override void processMessage(string message)
 		{
 			base.processMessage(message);
 
 			// Get message content
-			var content = message.AsString;
-			var collectTaskResult = JsonConvert.DeserializeObject<CollectTaskResult>(content);
+			var collectTaskResult = JsonConvert.DeserializeObject<CollectTaskResult>(message);
+
 
 			Trace.TraceInformation("Result received: " + collectTaskResult.Task.Method);
 		}
