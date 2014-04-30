@@ -61,12 +61,12 @@ namespace Common.Worker
 
 		private void sendResult(CollectTaskResult result)
 		{
-			//var msgStr = JsonConvert.SerializeObject(result);
-			//CloudQueueMessage msg = new CloudQueueMessage(msgStr);
+			var msgStr = JsonConvert.SerializeObject(result);
+			CloudQueueMessage msg = new CloudQueueMessage(msgStr);
 
-			//resultQueue.AddMessage(msg);
+			resultQueue.AddMessage(msg);
 
-			Trace.TraceInformation("Result sended");
+			Trace.TraceInformation("Result sended: " + result.Task.Method);
 		}
 	}
 }
