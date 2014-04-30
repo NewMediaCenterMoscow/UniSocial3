@@ -11,10 +11,12 @@ namespace Common.Worker
 {
 	public class DbWriterWorker : BaseMessageBlobWorker
 	{
+		ApiHelper apiHelper;
+
 		public DbWriterWorker(string StorageQueueConnectionString, string QueueName, string ContainerName)
 			: base(StorageQueueConnectionString, QueueName, ContainerName)
 		{
- 
+			apiHelper = new ApiHelper();
 		}
 
 		protected override void processMessage(string message)
@@ -24,6 +26,7 @@ namespace Common.Worker
 			// Get message content
 			var collectTaskResult = JsonConvert.DeserializeObject<CollectTaskResult>(message);
 
+			var resuls = apiHelper.DeserializeResult(collectTaskResult.Task, collectTaskResult.SerializedResult);
 
 			Trace.TraceInformation("Result received: " + collectTaskResult.Task.Method);
 		}
