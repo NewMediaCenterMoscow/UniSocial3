@@ -54,6 +54,7 @@ namespace Common
 		void setCallParams()
 		{
 			apiCalls = new Dictionary<string, Func<string, object>>();
+			deserializationCalls = new Dictionary<string, Func<string, object>>();
 
 			setCallParams(SocialNetwork.VKontakte);
 		}
@@ -68,7 +69,7 @@ namespace Common
 			var desObjType = typeof(JsonConvert);
 
 			//var desMethod = desObjType.GetMethod("DeserializeObject", BindingFlags.Static | BindingFlags.Public, Type.DefaultBinder, new Type[] { typeof(string) }, null);
-			var desMethod = desObjType.GetMethod("DeserializeObject", BindingFlags.Static | BindingFlags.Public, Type.DefaultBinder, new Type[] { typeof(string) }, null);
+			var desMethod = desObjType.GetMethods().Where(m => m.Name == "DeserializeObject" && m.IsGenericMethod && m.GetParameters().Count() == 1).First();
 
 			// Key - method name, value - type
 			foreach (var mp in mappings)
