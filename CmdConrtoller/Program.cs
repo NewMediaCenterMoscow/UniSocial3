@@ -53,8 +53,10 @@ namespace CmdConrtoller
 
 			var task = new CollectTask();
 			task.SocialNetwork = SocialNetwork.VKontakte;
+			//task.Method = "users.get";
+			//task.Params = "1,6";
 			task.Method = "groups.getMembers";
-			task.Params = "1";
+			task.Params = "68518750"; 
 			var messageString = JsonConvert.SerializeObject(task);
 
 			var cbMesage = CloudQueueBlobMessage.CreateMessageWithContent(messageString);

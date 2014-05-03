@@ -18,8 +18,8 @@
     <ConfigurationSettings>
       <Setting name="StorageConnectionString" />
       <Setting name="resultsQueueName" />
-      <Setting name="tasksQueueName" />
       <Setting name="resultQueueContainerName" />
+      <Setting name="DbConnectionString" />
     </ConfigurationSettings>
   </WorkerRole>
 </ServiceDefinition>

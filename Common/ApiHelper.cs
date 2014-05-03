@@ -51,6 +51,11 @@ namespace Common
 			return res;
 		}
 
+		public static string GetKey(SocialNetwork Network, string Method)
+		{
+			return (int)Network + Method;
+		}
+
 		void setCallParams()
 		{
 			apiCalls = new Dictionary<string, Func<string, object>>();
@@ -62,7 +67,7 @@ namespace Common
 		void setCallParams(SocialNetwork socialNetwork)
 		{
 			var api = ninjectKernels[socialNetwork].Get<IApi>();
-			var mappings = ninjectKernels[socialNetwork].Get<IMethodMappingProvider>().GetMappings();
+			var mappings = ninjectKernels[socialNetwork].Get<IMethodMappingProvider>().GetTypeMappings();
 			var apiSettingsProvider = ninjectKernels[socialNetwork].Get<IApiSettingsProvider>();
 
 			var apiObjType = typeof(ApiHelper);
@@ -100,12 +105,12 @@ namespace Common
 
 		void addCall(Dictionary<string, Func<string, object>> callStorage, SocialNetwork socialNetwork, string method, Func<string, object> call)
 		{
-			var key = (int)socialNetwork + method;
+			var key = GetKey(socialNetwork, method);
 			callStorage.Add(key, call);
 		}
 		Func<string, object> getCall(Dictionary<string, Func<string, object>> callStorage, SocialNetwork socialNetwork, string method)
 		{
-			var key = (int)socialNetwork + method;
+			var key = GetKey(socialNetwork, method);
 
 			if (!callStorage.ContainsKey(key))
 				throw new NotSupportedException("Not supported: " + socialNetwork + " - " + method);

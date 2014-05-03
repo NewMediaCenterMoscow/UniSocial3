@@ -81,6 +81,7 @@
     <Compile Include="ApiMapping\IMethodMappingProvider.cs" />
     <Compile Include="ApiMapping\BaseMethodMappingProvider.cs" />
     <Compile Include="ApiMapping\VkMethodMappingProvider.cs" />
+    <Compile Include="Database\DbWriter.cs" />
     <Compile Include="Model\CollectTask.cs" />
     <Compile Include="Model\CollectTaskResult.cs" />
     <Compile Include="NinjectModules\Vk.cs" />
@@ -101,6 +102,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="app.config" />
+    <Content Include="Database\settings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />

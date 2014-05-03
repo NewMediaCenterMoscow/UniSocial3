@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -9,6 +10,7 @@ namespace Common.ApiMapping
 {
 	interface IMethodMappingProvider
 	{
-		Dictionary<string, string> GetMappings();
+		Dictionary<string, string> GetTypeMappings();
+		string GetTypeMapping(string Method);
 	}
 }

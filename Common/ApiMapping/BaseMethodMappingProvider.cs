@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -10,12 +11,12 @@ namespace Common.ApiMapping
 {
 	public abstract class BaseMethodMappingProvider : IMethodMappingProvider
 	{
-		Dictionary<string, string> mappings;
+		Dictionary<string, string> typeMappings;
 
 
 		public BaseMethodMappingProvider(string MappingFilename)
 		{
-			mappings = new Dictionary<string, string>();
+			typeMappings = new Dictionary<string, string>();
 
 			var json = File.ReadAllText(MappingFilename);
 			var jsonSettings = JObject.Parse(json);
@@ -23,16 +24,20 @@ namespace Common.ApiMapping
 			foreach (var mp in jsonSettings["methods"])
 			{
 				var typeName = transfomrType((string)mp["type"]);
-				mappings.Add((string)mp["name"], typeName);
+				typeMappings.Add((string)mp["name"], typeName);
 			}
 		}
 
-		public Dictionary<string, string> GetMappings()
+		public Dictionary<string, string> GetTypeMappings()
 		{
-			return mappings;
+			return typeMappings;
+		}
+
+		public string GetTypeMapping(string Method)
+		{
+			return typeMappings[Method];
 		}
 
 		protected abstract string transfomrType(string Name);
-
 	}
 }

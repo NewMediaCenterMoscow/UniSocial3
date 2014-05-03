@@ -1,4 +1,5 @@
-﻿using Common.Model;
+﻿using Common.Database;
+using Common.Model;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -12,11 +13,13 @@ namespace Common.Worker
 	public class DbWriterWorker : BaseMessageBlobWorker
 	{
 		ApiHelper apiHelper;
+		DbWriter dbWriter;
 
-		public DbWriterWorker(string StorageQueueConnectionString, string QueueName, string ContainerName)
+		public DbWriterWorker(string StorageQueueConnectionString, string QueueName, string ContainerName, string ConnectionString)
 			: base(StorageQueueConnectionString, QueueName, ContainerName)
 		{
 			apiHelper = new ApiHelper();
+			dbWriter = new DbWriter(ConnectionString);
 		}
 
 		protected override void processMessage(string message)
@@ -25,10 +28,13 @@ namespace Common.Worker
 
 			// Get message content
 			var collectTaskResult = JsonConvert.DeserializeObject<CollectTaskResult>(message);
-
 			var resuls = apiHelper.DeserializeResult(collectTaskResult.Task, collectTaskResult.SerializedResult);
 
 			Trace.TraceInformation("Result received: " + collectTaskResult.Task.Method);
+
+			dbWriter.WriteObject(collectTaskResult.Task, resuls);
+
+			Trace.TraceInformation("Result saved: " + collectTaskResult.Task.Method);
 		}
 	}
 }
