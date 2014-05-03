@@ -17,7 +17,7 @@ namespace DbWriterRole
 	public class WorkerRole : RoleEntryPoint
 	{
 		DbWriterWorker worker;
-		HttpListener listener;
+		HttpStatusServer statusServer;
 
 		public override void Run()
 		{
@@ -40,13 +40,15 @@ namespace DbWriterRole
 				RoleEnvironment.GetConfigurationSettingValue("resultQueueContainerName");
 			var dbConnectionString =
 				RoleEnvironment.GetConfigurationSettingValue("DbConnectionString");
-			var statusENdpoint =
+			var statusEndpoint =
 				RoleEnvironment.CurrentRoleInstance.InstanceEndpoints["StatusEndpoint"].IPEndpoint;
 
 			worker = new DbWriterWorker(storageConnStr, resultsQueueName, containerName, dbConnectionString);
 			worker.Initialize();
 
-			createHttpStatusServer(statusENdpoint);
+			statusServer = new HttpStatusServer("http://*:" + statusEndpoint.Port + "/");
+			statusServer.HttpGetStatusRequest += statusServer_HttpGetStatusRequest;
+			statusServer.Start();
 
 			return base.OnStart();
 		}
@@ -54,33 +56,17 @@ namespace DbWriterRole
 		public override void OnStop()
 		{
 			worker.Stop();
-			listener.Stop();
-
+			statusServer.Stop();
 
 			base.OnStop();
 		}
 
-		private void createHttpStatusServer(IPEndPoint statusENdpoint)
+		void statusServer_HttpGetStatusRequest(object sender, HttpGetStatusRequestEventArgs e)
 		{
-			HttpListener listener = new HttpListener();
+			string response = "{\"counter\":" + worker.GetCounter() + "}";
+			var respBytes = Encoding.UTF8.GetBytes(response);
 
-			listener.Start();
-
-			listener.Prefixes.Add("http://*:" + statusENdpoint.Port + "/");
-
-			Task.Run(async () => {
-				while (true) {
-					var ctx = await listener.GetContextAsync();
-
-					string response = "{counter:" + worker.GetCounter() + "}";
-					var respBytes = Encoding.UTF8.GetBytes(response);
-
-					ctx.Response.OutputStream.Write(respBytes, 0, respBytes.Length);
-					ctx.Response.OutputStream.Close();
-
-					Thread.Sleep(10);
-				}
-			});
+			e.OutputStream.Write(respBytes, 0, respBytes.Length);
 		}
 
 	}
