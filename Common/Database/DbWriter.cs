@@ -19,7 +19,9 @@ namespace Common.Database
 		protected string connStr;
 		protected SqlConnection sqlConn;
 
-		protected Dictionary<string, Tuple<string, List<Tuple<string,SqlDbType>>>> commands;
+		protected Dictionary<string, Tuple<string, List<Tuple<string, SqlDbType>>>> commands;
+		protected Dictionary<string, DataTable> dataTables;
+
 
 		protected string settingsFilename = "Database/settings.json";
 
@@ -29,7 +31,8 @@ namespace Common.Database
 
 			setConnection();
 
-			commands = new Dictionary<string,Tuple<string,List<Tuple<string,SqlDbType>>>>();
+			commands = new Dictionary<string, Tuple<string, List<Tuple<string, SqlDbType>>>>();
+			dataTables = new Dictionary<string, DataTable>();
 			loadSettings();
 		}
 
@@ -89,55 +92,99 @@ namespace Common.Database
 			var query = queryStart + " (" + fs + ") VALUES (" + fp + ")";
 
 			commands.Add(key, new Tuple<string, List<Tuple<string, SqlDbType>>>(query, fields));
+
+			var dataTable = new DataTable(table);
+			foreach (var field in fields)
+				dataTable.Columns.Add(field.Item1);
+
+			dataTables.Add(key, dataTable);
 		}
 
-		protected SqlCommand createCommand(CollectTask task)
+		protected Tuple<SqlCommand, SqlBulkCopy, DataTable> createCommand(CollectTask task)
 		{
 			var key = ApiHelper.GetKey(task.SocialNetwork, task.Method);
 
 			var query = commands[key].Item1;
 			var sqlParamsTuple = commands[key].Item2;
 
-			var sqlParams = from ff in sqlParamsTuple select new SqlParameter("@" + ff.Item1, ff.Item2);
+			var sqlParams = sqlParamsTuple.Select(pt => new SqlParameter("@" + pt.Item1, pt.Item2));//from pt in sqlParamsTuple select new SqlParameter("@" + pt.Item1, pt.Item2);
 
 			var sqlCmd = new SqlCommand(query, sqlConn);
 			sqlCmd.Parameters.AddRange(sqlParams.ToArray());
 
-			return sqlCmd;
+
+			var sqlBulk = new SqlBulkCopy(sqlConn);
+			sqlBulk.DestinationTableName = dataTables[key].TableName;
+			var bulkMappings = sqlParamsTuple.Select((pt, index) => new SqlBulkCopyColumnMapping(index, pt.Item1));
+
+			foreach (var item in bulkMappings)
+				sqlBulk.ColumnMappings.Add(item);
+
+			return new Tuple<SqlCommand, SqlBulkCopy, DataTable>(sqlCmd, sqlBulk, dataTables[key]);
 		}
 
 		public void WriteObject(CollectTask task, object data)
 		{
 			checkConnection();
 
-			var sqlCmd = createCommand(task);
+			var sqlCmds = createCommand(task);
 
 			if (data is VkList<long>)
 			{
-				writeObjects(task, data as VkList<long>, sqlCmd);
+				writeObjects(task, data as VkList<long>, sqlCmds);
 			}
 		}
 
-		protected void writeObjects(CollectTask task, VkList<long> data, SqlCommand sqlCmd)
+		protected void writeObjects(CollectTask task, VkList<long> data, Tuple<SqlCommand, SqlBulkCopy, DataTable> sqlCmds)
 		{
-			var p1 = long.Parse(task.Params);
-			foreach (var item in data.Items)
-			{
-				sqlCmd.Parameters[0].Value = p1;
-				sqlCmd.Parameters[1].Value = item;
+			var batchSize = 300;
+			var groupedItems = data.Items
+				.Select((item, index) => new { Index = index, Item = item })
+				.GroupBy(di => di.Index / batchSize)
+				;
 
+			var insertCmd = sqlCmds.Item1;
+			var bulkCopy = sqlCmds.Item2;
+			var dataTable = sqlCmds.Item3;
+
+			var p1 = long.Parse(task.Params);
+
+			// First, try to insert group in batch mode
+			foreach (var item in groupedItems)
+			{
+				dataTable.Clear();
+				foreach (var row in item)
+				{
+					dataTable.Rows.Add(p1, row.Item);
+				}
 
 				try
 				{
-					sqlCmd.ExecuteNonQuery();
+					bulkCopy.WriteToServer(dataTable);
 				}
-				catch (SqlException ex)
+				catch (SqlException) // Exception - insert row-by-row
 				{
-					Trace.TraceError("SqlException: " + ex.Message);
+					Trace.TraceWarning("Bulk exception: insert rows");
+
+					foreach (var row in item)
+					{
+						insertCmd.Parameters[0].Value = p1;
+						insertCmd.Parameters[1].Value = row.Item;
+
+						try
+						{
+							insertCmd.ExecuteNonQuery();
+						}
+						catch (SqlException ex)
+						{
+							Trace.TraceError("Insert exception: " + ex.Message);
+						}
+					}
+
 				}
 			}
 
-			sqlCmd.Dispose();
+
 		}
 
 
