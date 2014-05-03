@@ -9,12 +9,15 @@ using Microsoft.WindowsAzure.Diagnostics;
 using Microsoft.WindowsAzure.ServiceRuntime;
 using Microsoft.WindowsAzure.Storage;
 using Common.Worker;
+using System.Threading.Tasks;
+using System.Text;
 
 namespace DbWriterRole
 {
 	public class WorkerRole : RoleEntryPoint
 	{
 		DbWriterWorker worker;
+		HttpListener listener;
 
 		public override void Run()
 		{
@@ -37,9 +40,13 @@ namespace DbWriterRole
 				RoleEnvironment.GetConfigurationSettingValue("resultQueueContainerName");
 			var dbConnectionString =
 				RoleEnvironment.GetConfigurationSettingValue("DbConnectionString");
+			var statusENdpoint =
+				RoleEnvironment.CurrentRoleInstance.InstanceEndpoints["StatusEndpoint"].IPEndpoint;
 
 			worker = new DbWriterWorker(storageConnStr, resultsQueueName, containerName, dbConnectionString);
 			worker.Initialize();
+
+			createHttpStatusServer(statusENdpoint);
 
 			return base.OnStart();
 		}
@@ -47,8 +54,34 @@ namespace DbWriterRole
 		public override void OnStop()
 		{
 			worker.Stop();
+			listener.Stop();
+
 
 			base.OnStop();
 		}
+
+		private void createHttpStatusServer(IPEndPoint statusENdpoint)
+		{
+			HttpListener listener = new HttpListener();
+
+			listener.Start();
+
+			listener.Prefixes.Add("http://*:" + statusENdpoint.Port + "/");
+
+			Task.Run(async () => {
+				while (true) {
+					var ctx = await listener.GetContextAsync();
+
+					string response = "{counter:" + worker.GetCounter() + "}";
+					var respBytes = Encoding.UTF8.GetBytes(response);
+
+					ctx.Response.OutputStream.Write(respBytes, 0, respBytes.Length);
+					ctx.Response.OutputStream.Close();
+
+					Thread.Sleep(10);
+				}
+			});
+		}
+
 	}
 }

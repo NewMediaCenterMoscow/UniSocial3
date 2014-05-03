@@ -43,5 +43,10 @@ namespace Common.Worker
 
 			Trace.TraceInformation("Result saved: " + collectTaskResult.Task.Method);
 		}
+
+		public long GetCounter()
+		{
+			return counter;
+		}
 	}
 }

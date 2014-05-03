@@ -56,7 +56,7 @@ namespace CmdConrtoller
 			//task.Method = "users.get";
 			//task.Params = "1,6";
 			task.Method = "groups.getMembers";
-			task.Params = "68518750"; 
+			task.Params = "1"; 
 			var messageString = JsonConvert.SerializeObject(task);
 
 			var cbMesage = CloudQueueBlobMessage.CreateMessageWithContent(messageString);
