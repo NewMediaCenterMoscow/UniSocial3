@@ -114,7 +114,7 @@ namespace Common.Worker
 
 		protected virtual void processMessage(string rawMessageContent)
 		{
-			Trace.TraceInformation("Load message: " + rawMessageContent.GetHashCode(), "Information");
+			//Trace.TraceInformation("Load message: " + rawMessageContent.GetHashCode(), "Information");
 		}
 	}
 }

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Common.Worker
@@ -15,11 +16,15 @@ namespace Common.Worker
 		ApiHelper apiHelper;
 		DbWriter dbWriter;
 
+		long counter;
+
 		public DbWriterWorker(string StorageQueueConnectionString, string QueueName, string ContainerName, string ConnectionString)
 			: base(StorageQueueConnectionString, QueueName, ContainerName)
 		{
 			apiHelper = new ApiHelper();
 			dbWriter = new DbWriter(ConnectionString);
+
+			counter = 0;
 		}
 
 		protected override void processMessage(string message)
@@ -32,7 +37,9 @@ namespace Common.Worker
 
 			Trace.TraceInformation("Result received: " + collectTaskResult.Task.Method);
 
+			Interlocked.Increment(ref counter);
 			dbWriter.WriteObject(collectTaskResult.Task, resuls);
+			Interlocked.Decrement(ref counter);
 
 			Trace.TraceInformation("Result saved: " + collectTaskResult.Task.Method);
 		}

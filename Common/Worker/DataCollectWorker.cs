@@ -42,6 +42,8 @@ namespace Common.Worker
 
 			var collectTask = JsonConvert.DeserializeObject<CollectTask>(message);
 
+			Trace.TraceInformation("Task: " + collectTask.Method);
+
 			collectData(collectTask);
 		}
 

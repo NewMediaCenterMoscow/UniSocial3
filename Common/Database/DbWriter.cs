@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -18,7 +19,7 @@ namespace Common.Database
 		protected string connStr;
 		protected SqlConnection sqlConn;
 
-		protected Dictionary<string, Tuple<string, SqlParameter[]>> commands;
+		protected Dictionary<string, Tuple<string, List<Tuple<string,SqlDbType>>>> commands;
 
 		protected string settingsFilename = "Database/settings.json";
 
@@ -28,7 +29,7 @@ namespace Common.Database
 
 			setConnection();
 
-			commands = new Dictionary<string, Tuple<string, SqlParameter[]>>();
+			commands = new Dictionary<string,Tuple<string,List<Tuple<string,SqlDbType>>>>();
 			loadSettings();
 		}
 
@@ -48,6 +49,10 @@ namespace Common.Database
 			if (sqlConn == null)
 				sqlConn = new SqlConnection(connStr);
 
+		}
+
+		protected void checkConnection()
+		{
 			if (sqlConn.State == ConnectionState.Closed)
 				sqlConn.Open();
 		}
@@ -83,94 +88,59 @@ namespace Common.Database
 			var fp = String.Join(",", fields.Select(ft => "@" + ft.Item1));
 			var query = queryStart + " (" + fs + ") VALUES (" + fp + ")";
 
-			var sqlParams = from ff in fields select new SqlParameter("@" + ff.Item1, ff.Item2);
-
-			commands.Add(key, new Tuple<string, SqlParameter[]>(query, sqlParams.ToArray()));
+			commands.Add(key, new Tuple<string, List<Tuple<string, SqlDbType>>>(query, fields));
 		}
 
-
-
-		//protected void setTableNamesAndCommands()
-		//{
-		//	tableNames = new Dictionary<string, string>();
-		//	commands = new Dictionary<string, string>();
-
-		//	addTableNameAndCommand(SocialNetwork.VKontakte, "groups.getMembers", "user_groups", "(group_id, user_id) VALUES (@p1, @p2)");
-		//	addTableNameAndCommand(SocialNetwork.VKontakte, "groups.get", "user_groups", "(user_id, group_id) VALUES (@p1, @p2)");
-		//}
-
-		//private void addTableNameAndCommand(SocialNetwork network, string method, string tableName, string cmd)
-		//{
-		//	var key = ApiHelper.GetKey(network, method);
-			
-		//	tableNames.Add(key, tableName);
-
-		//	var sql = "INSERT INTO " + tableNames[key] + " " + cmd;
-		//	commands.Add(key, sql);
-		//}
-
-		public void WriteObject(CollectTask task, object data)
-		{
-			if (data is VkList<long>)
-			{
-				writeObject(task, data as VkList<long>);
-			}
-		}
-
-		protected void writeObject(CollectTask task, VkList<long> data)
+		protected SqlCommand createCommand(CollectTask task)
 		{
 			var key = ApiHelper.GetKey(task.SocialNetwork, task.Method);
 
 			var query = commands[key].Item1;
-			var sqlParams = commands[key].Item2;
+			var sqlParamsTuple = commands[key].Item2;
 
-			setConnection();
+			var sqlParams = from ff in sqlParamsTuple select new SqlParameter("@" + ff.Item1, ff.Item2);
 
 			var sqlCmd = new SqlCommand(query, sqlConn);
-			sqlCmd.Parameters.AddRange(sqlParams);
+			sqlCmd.Parameters.AddRange(sqlParams.ToArray());
 
+			return sqlCmd;
+		}
+
+		public void WriteObject(CollectTask task, object data)
+		{
+			checkConnection();
+
+			var sqlCmd = createCommand(task);
+
+			if (data is VkList<long>)
+			{
+				writeObjects(task, data as VkList<long>, sqlCmd);
+			}
+		}
+
+		protected void writeObjects(CollectTask task, VkList<long> data, SqlCommand sqlCmd)
+		{
 			var p1 = long.Parse(task.Params);
 			foreach (var item in data.Items)
 			{
 				sqlCmd.Parameters[0].Value = p1;
 				sqlCmd.Parameters[1].Value = item;
-				sqlCmd.ExecuteNonQuery();
+
+
+				try
+				{
+					sqlCmd.ExecuteNonQuery();
+				}
+				catch (SqlException ex)
+				{
+					Trace.TraceError("SqlException: " + ex.Message);
+				}
 			}
+
+			sqlCmd.Dispose();
 		}
 
-		//protected void writeObject(CollectTask task, VkList<long> data)
-		//{
-		//	var key = ApiHelper.GetKey(task.SocialNetwork, task.Method);
-		//	var tablename = tableNames[key];
-		//	var query = commands[key];
 
-		//	setConnection();
-
-		//	var sqlCmd = new SqlCommand(query, sqlConn);
-		//	var sqlParameters = new SqlParameter[] 
-		//	{
-		//	   new SqlParameter("@p1", SqlDbType.BigInt),
-		//	   new SqlParameter("@p2", SqlDbType.BigInt),
-		//	};
-		//	sqlCmd.Parameters.AddRange(sqlParameters);
-
-		//	var p1 = long.Parse(task.Params);
-		//	foreach (var item in data.Items)
-		//	{
-		//		sqlCmd.Parameters[0].Value = p1;
-		//		sqlCmd.Parameters[1].Value = item;
-		//		sqlCmd.ExecuteNonQuery();
-		//	}
-		//}
-		//protected void writeObject(CollectTask task, List<VkUser> data)
-		//{
-		//	var key = ApiHelper.GetKey(task.SocialNetwork, task.Method);
-		//	var tablename = tableNames[key];
-		//	var query = commands[key];
-
-		//	setConnection();
-
-		//}
 
 	}
 }

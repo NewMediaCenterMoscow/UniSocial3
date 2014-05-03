@@ -18,7 +18,7 @@ namespace Common.Worker
 		protected CloudQueueClient queueClient;
 		protected CloudQueue queue;
 
-		protected int baseSleepInterval = 5000;
+		protected int baseSleepInterval = 30000;
 		protected int messagePerOneRequest = 32;
 		protected CancellationTokenSource cancelTokenSource;
 		protected ParallelOptions processMessageParallerOptions;
@@ -77,9 +77,15 @@ namespace Common.Worker
 			while (!cancelToken.IsCancellationRequested)
 			{
 				var messages = queue.GetMessages(messagePerOneRequest);
-				Parallel.ForEach(messages, processMessageParallerOptions, processMessage);
 
-				Thread.Sleep(baseSleepInterval);
+				if (messages.Count() != 0)
+				{
+					Parallel.ForEach(messages, processMessageParallerOptions, processMessage);
+				}
+				else
+				{
+					Thread.Sleep(baseSleepInterval);
+				}
 			}
 
 			Trace.TraceInformation("Stopped");
@@ -87,7 +93,7 @@ namespace Common.Worker
 
 		protected virtual void processMessage(CloudQueueMessage message)
 		{
-			Trace.TraceInformation("Get message: " + message.Id, "Information");
+			//Trace.TraceInformation("Get message: " + message.Id, "Information");
 
 			queue.DeleteMessage(message);
 		}
