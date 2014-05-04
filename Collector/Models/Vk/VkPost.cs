@@ -24,8 +24,8 @@ namespace Collector.Models.Vk
 
 	public class VkPost : VKBaseWallObject
 	{
-		[JsonProperty("to_id")]
-		public long ToId { get; set; }
+		[JsonProperty("owner_id")]
+		public long OwnerId { get; set; }
 
 		[JsonProperty("post_type")]
 		public VkPostType PostType { get; set; }
@@ -61,7 +61,7 @@ namespace Collector.Models.Vk
 
 		public override string ToString()
 		{
-			return ToId + "\t-\t" + Id;
+			return OwnerId + "\t-\t" + Id;
 		}
 
 	}

@@ -12,7 +12,7 @@ namespace Collector.Api
 	{
 		static string vkBaseUri = "https://api.vk.com/method/";
 
-		string apiVersion = "5.16";
+		string apiVersion = "5.21";
 		string lang = "ru";
 
 		string accessToken = "zzz";

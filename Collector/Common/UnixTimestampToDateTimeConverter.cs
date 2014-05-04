@@ -23,7 +23,9 @@ namespace Collector.Common
 
 		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
 		{
-			throw new NotImplementedException();
+			var val = (DateTime)value;
+
+			writer.WriteValue(DateTimeHelpers.ToUnixTimestamp(val));
 		}
 	}
 }
