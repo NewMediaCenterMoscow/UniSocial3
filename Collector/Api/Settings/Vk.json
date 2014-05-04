@@ -48,7 +48,7 @@
 		"name":"users.getSubscriptions", 
 		"params": {
 			"batch_size": 1,
-			"items_max_count": 200,
+			"items_max_count": 1,
 			"id_params": ["user_id" ],
 			"is_need_access_toke": false,
 			"request_params": {  }

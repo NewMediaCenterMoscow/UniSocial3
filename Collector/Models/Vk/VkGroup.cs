@@ -31,7 +31,17 @@ namespace Collector.Models.Vk
 		public VkGroupType Type { get; set; }
 
 		[JsonProperty("members_count")]
-		public int MembersCount { get; set; }
+		public long MembersCount { get; set; }
+
+		[JsonProperty("photo_50")]
+		public string Photo50 { get; set; }
+
+		[JsonProperty("photo_100")]
+		public string Photo100 { get; set; }
+
+		[JsonProperty("photo_200")]
+		public string Photo200 { get; set; }
+
 
 		//[JsonProperty("data_collection_id")]
 		//public int DataCollectionId { get; set; }

@@ -68,12 +68,12 @@ namespace Common.Database
 			var param = from item in jsonSettings["items"]
 						select new
 						{
-							network = (SocialNetwork)Enum.Parse(typeof(SocialNetwork), (string)item["network"]),
+							network = (SocialNetwork)Enum.Parse(typeof(SocialNetwork), (string)item["network"], true),
 							method = (string)item["method"],
 							table = (string)item["table"],
 							fields = from prop in item["fields"] 
 									 let jprop = prop as JProperty
-									 select new Tuple<string, SqlDbType>(jprop.Name, (SqlDbType)Enum.Parse(typeof(SqlDbType), (string)jprop.Value))
+									 select new Tuple<string, SqlDbType>(jprop.Name, (SqlDbType)Enum.Parse(typeof(SqlDbType), (string)jprop.Value, true))
 						};
 
 			foreach (var p in param)
@@ -127,27 +127,122 @@ namespace Common.Database
 		{
 			checkConnection();
 
-			var sqlCmds = createCommand(task);
-
 			if (data is VkList<long>)
 			{
-				writeObjects(task, data as VkList<long>, sqlCmds);
+				writeObjects(task, data as VkList<long>);
+			}
+			if (data is List<VkGroup>)
+			{
+				writeObjects(task, data as List<VkGroup>);
+			}
+			if (data is List<VkUser>)
+			{
+				writeObjects(task, data as List<VkUser>);
+			}
+			if (data is VkUserSubscriptions)
+			{
+				writeObjects(task, (data as VkUserSubscriptions).Groups);
 			}
 		}
 
-		protected void writeObjects(CollectTask task, VkList<long> data, Tuple<SqlCommand, SqlBulkCopy, DataTable> sqlCmds)
-		{
-			var batchSize = 300;
-			var groupedItems = data.Items
-				.Select((item, index) => new { Index = index, Item = item })
-				.GroupBy(di => di.Index / batchSize)
-				;
+		protected delegate void addDataRowDelegate(DataTable dt, object data);
+		protected delegate void setSqlParamsDelegate(SqlCommand cmd, object data);
 
+		private void writeObjects(CollectTask task, List<VkUser> data)
+		{
+			addDataRowDelegate addDataRow = (DataTable dt, object dat) =>
+			{
+				var d = dat as VkUser;
+				dt.Rows.Add(d.Id, d.FirstName, d.LastName, (int)d.Sex, d.Nickname, d.ScreenName, d.BDate, d.Country.Id, d.City.Id, d.Deactivated, d.Timezone, d.Photo50, d.Photo100, d.Photo200, d.PhotoMaxOrig, d.HasMobile, d.Online, d.MobilePhone, d.HomePhone, d.University, d.UniversityName, d.Faculty, d.FacultyName, d.Graduation);
+			};
+
+			setSqlParamsDelegate setSqlParam = (SqlCommand cmd, object dat) =>
+			{
+				var d = dat as VkUser;
+				cmd.Parameters[0].Value = d.Id;
+				cmd.Parameters[1].Value = d.FirstName;
+				cmd.Parameters[2].Value = d.LastName;
+				cmd.Parameters[3].Value = (int)d.Sex;
+				cmd.Parameters[4].Value = d.Nickname;
+				cmd.Parameters[5].Value = d.ScreenName;
+				cmd.Parameters[6].Value = d.BDate;
+				cmd.Parameters[7].Value = d.Country.Id;
+				cmd.Parameters[8].Value = d.City.Id;
+				cmd.Parameters[9].Value = d.Deactivated;
+				cmd.Parameters[10].Value = d.Timezone;
+				cmd.Parameters[11].Value = d.Photo50;
+				cmd.Parameters[12].Value = d.Photo100;
+				cmd.Parameters[13].Value = d.Photo200;
+				cmd.Parameters[14].Value = d.PhotoMaxOrig;
+				cmd.Parameters[15].Value = d.HasMobile;
+				cmd.Parameters[16].Value = d.Online;
+				cmd.Parameters[17].Value = d.MobilePhone;
+				cmd.Parameters[18].Value = d.HomePhone;
+				cmd.Parameters[19].Value = d.University;
+				cmd.Parameters[20].Value = d.UniversityName;
+				cmd.Parameters[21].Value = d.Faculty;
+				cmd.Parameters[22].Value = d.FacultyName;
+				cmd.Parameters[23].Value = d.Graduation;
+			};
+
+			writeObjects(task, data, setSqlParam, addDataRow);
+		}
+
+		private void writeObjects(CollectTask task, List<VkGroup> data)
+		{
+			addDataRowDelegate addDataRow = (DataTable dt, object dat) => {
+				var d = dat as VkGroup;
+				dt.Rows.Add(d.Id, d.Name, d.ScreenName, d.IsClosed, (int)d.Type, d.MembersCount, d.Photo50, d.Photo100, d.Photo200);
+			};
+
+			setSqlParamsDelegate setSqlParam = (SqlCommand cmd, object dat) => {
+				var d = dat as VkGroup;
+				cmd.Parameters[0].Value = d.Id;
+				cmd.Parameters[1].Value = d.Name;
+				cmd.Parameters[2].Value = d.ScreenName;
+				cmd.Parameters[3].Value = d.IsClosed;
+				cmd.Parameters[4].Value = (int)d.Type;
+				cmd.Parameters[5].Value = d.MembersCount;
+				cmd.Parameters[6].Value = d.Photo50;
+				cmd.Parameters[7].Value = d.Photo100;
+				cmd.Parameters[8].Value = d.Photo200;
+			};
+
+			writeObjects(task, data, setSqlParam, addDataRow);
+		}
+
+		protected void writeObjects(CollectTask task, VkList<long> data)
+		{
+			var p1 = long.Parse(task.Params);
+			addDataRowDelegate addDataRow = (DataTable dt, object dat) =>
+			{
+				var d = (long)dat;
+				dt.Rows.Add(p1, d);
+			};
+			setSqlParamsDelegate setSqlParam = (SqlCommand cmd, object dat) =>
+			{
+				var d = (long)dat;
+				cmd.Parameters[0].Value = p1;
+				cmd.Parameters[1].Value = d;
+			};
+
+			writeObjects(task, data.Items.Cast<object>(), setSqlParam, addDataRow);
+		}
+
+		protected void writeObjects(CollectTask task, IEnumerable<object> items, setSqlParamsDelegate setSqlParams, addDataRowDelegate addDataRow)
+		{
+			// Create command to bulk copy and insert, as well as a DataTable
+			var sqlCmds = createCommand(task);
 			var insertCmd = sqlCmds.Item1;
 			var bulkCopy = sqlCmds.Item2;
 			var dataTable = sqlCmds.Item3;
 
-			var p1 = long.Parse(task.Params);
+			// Group items in batch
+			var batchSize = 300;
+			var groupedItems = items
+				.Select((item, index) => new { Index = index, Item = item })
+				.GroupBy(di => di.Index / batchSize)
+				;
 
 			// First, try to insert group in batch mode
 			foreach (var item in groupedItems)
@@ -155,7 +250,7 @@ namespace Common.Database
 				dataTable.Clear();
 				foreach (var row in item)
 				{
-					dataTable.Rows.Add(p1, row.Item);
+					addDataRow(dataTable, row.Item);
 				}
 
 				try
@@ -168,8 +263,7 @@ namespace Common.Database
 
 					foreach (var row in item)
 					{
-						insertCmd.Parameters[0].Value = p1;
-						insertCmd.Parameters[1].Value = row.Item;
+						setSqlParams(insertCmd, row.Item);
 
 						try
 						{
@@ -184,9 +278,7 @@ namespace Common.Database
 				}
 			}
 
-
 		}
-
 
 
 	}
