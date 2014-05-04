@@ -143,11 +143,76 @@ namespace Common.Database
 			{
 				writeObjects(task, (data as VkUserSubscriptions).Groups);
 			}
+			if (data is VkList<VkPost>)
+			{
+				writeObjects(task, data as VkList<VkPost>);
+			}
+			if (data is VkList<VkComment>)
+			{
+				writeObjects(task, data as VkList<VkComment>);
+			}
+
 		}
 
 		protected delegate void addDataRowDelegate(DataTable dt, object data);
 		protected delegate void setSqlParamsDelegate(SqlCommand cmd, object data);
 
+		private void writeObjects(CollectTask task, VkList<VkComment> data)
+		{
+			var ids = task.Params.Split('_');
+			var owner_id = long.Parse(ids[0]);
+			var post_id = long.Parse(ids[1]);
+
+			addDataRowDelegate addDataRow = (DataTable dt, object dat) =>
+			{
+				var d = dat as VkComment;
+				dt.Rows.Add(owner_id, post_id, d.Id, d.FromId, d.Date, d.Text, d.Likes.Count);
+			};
+			setSqlParamsDelegate setSqlParam = (SqlCommand cmd, object dat) =>
+			{
+				var d = dat as VkComment;
+				cmd.Parameters[0].Value = owner_id;
+				cmd.Parameters[1].Value = post_id;
+				cmd.Parameters[2].Value = d.Id;
+				cmd.Parameters[3].Value = d.FromId;
+				cmd.Parameters[4].Value = d.Date;
+				cmd.Parameters[5].Value = d.Text;
+				cmd.Parameters[6].Value = d.Likes.Count;
+			};
+
+			writeObjects(task, data.Items, setSqlParam, addDataRow);
+		}
+		
+		private void writeObjects(CollectTask task, VkList<VkPost> data)
+		{
+			addDataRowDelegate addDataRow = (DataTable dt, object dat) =>
+			{
+				var d = dat as VkPost;
+				var copyPost = d.CopyHistory == null ? new VkPost() : d.CopyHistory.FirstOrDefault();
+				dt.Rows.Add(d.Id, d.FromId, d.OwnerId, d.Date, d.PostType.ToString(), d.Text, d.Comments.Count, d.Likes.Count, d.Reposts.Count, copyPost.Id, copyPost.FromId, copyPost.OwnerId, copyPost.Text ?? "");
+			};
+			setSqlParamsDelegate setSqlParam = (SqlCommand cmd, object dat) =>
+			{
+				var d = dat as VkPost;
+				var copyPost = d.CopyHistory == null ? new VkPost() : d.CopyHistory.FirstOrDefault();
+				cmd.Parameters[0].Value = d.Id;
+				cmd.Parameters[1].Value = d.FromId;
+				cmd.Parameters[2].Value = d.OwnerId;
+				cmd.Parameters[3].Value = d.Date;
+				cmd.Parameters[4].Value = d.PostType.ToString();
+				cmd.Parameters[5].Value = d.Text;
+				cmd.Parameters[6].Value = d.Comments.Count;
+				cmd.Parameters[7].Value = d.Likes.Count;
+				cmd.Parameters[8].Value = d.Reposts.Count;
+				cmd.Parameters[9].Value = copyPost.Id;
+				cmd.Parameters[10].Value = copyPost.FromId;
+				cmd.Parameters[11].Value = copyPost.OwnerId;
+				cmd.Parameters[12].Value = copyPost.Text ?? "";
+			};
+
+			writeObjects(task, data.Items, setSqlParam, addDataRow);
+		}
+		
 		private void writeObjects(CollectTask task, List<VkUser> data)
 		{
 			addDataRowDelegate addDataRow = (DataTable dt, object dat) =>

@@ -30,4 +30,28 @@
         "table": "user_groups",
         "fields": { "user_id": "BigInt", "group_id": "BigInt" }
     },
+    {
+        "network": "VKontakte",
+        "method": "wall.get",
+        "table": "posts",
+        "fields": { "id":"bigint","from_id":"bigint","owner_id":"bigint","date":"datetime","type":"nvarchar","text":"ntext","comment_count":"int","like_count":"int","repost_count":"int","copy_id":"bigint","copy_from_id":"bigint","copy_to_id":"bigint","copy_text":"ntext" }
+    }, 
+    {
+        "network": "VKontakte",
+        "method": "wall.getComments",
+        "table": "comments",
+        "fields": { "owner_id":"bigint","post_id":"bigint","id":"bigint","from_id":"bigint","date":"datetime","text":"ntext","like_count":"int" }
+    }, 
+    {
+        "network": "VKontakte",
+        "method": "wall.getReposts",
+        "table": "posts",
+        "fields": { "id":"bigint","from_id":"bigint","owner_id":"bigint","date":"datetime","type":"nvarchar","text":"ntext","comment_count":"int","like_count":"int","repost_count":"int","copy_id":"bigint","copy_from_id":"bigint","copy_to_id":"bigint","copy_text":"ntext" }
+    }, 
+    {
+        "network": "VKontakte",
+        "method": "friends.get",
+        "table": "friends",
+        "fields": { "user_id": "BigInt", "friend_id": "BigInt" }
+    }
 ]}
