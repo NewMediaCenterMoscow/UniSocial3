@@ -41,14 +41,23 @@ namespace DbWriterRole
 			var dbConnectionString =
 				RoleEnvironment.GetConfigurationSettingValue("DbConnectionString");
 			var statusEndpoint =
-				RoleEnvironment.CurrentRoleInstance.InstanceEndpoints["StatusEndpoint"].IPEndpoint;
+				RoleEnvironment.CurrentRoleInstance.InstanceEndpoints["StatusEndpoint"];
 
 			worker = new DbWriterWorker(storageConnStr, resultsQueueName, containerName, dbConnectionString);
 			worker.Initialize();
 
-			statusServer = new HttpStatusServer("http://*:" + statusEndpoint.Port + "/");
+			var endpoint = statusEndpoint.PublicIPEndpoint ?? statusEndpoint.IPEndpoint;
+			statusServer = new HttpStatusServer(new string[] { "http://*:" + endpoint.Port + "/", "http://unisocial.cloudapp.net" + endpoint.Port + "/" });
 			statusServer.HttpGetStatusRequest += statusServer_HttpGetStatusRequest;
-			statusServer.Start();
+
+			try
+			{
+				statusServer.Start();
+			}
+			catch (HttpListenerException ex)
+			{
+				Trace.TraceWarning("HttpListener: " + ex.Message);
+			}
 
 			return base.OnStart();
 		}

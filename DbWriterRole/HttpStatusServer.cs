@@ -26,12 +26,15 @@ namespace DbWriterRole
 
 		public event EventHandler<HttpGetStatusRequestEventArgs> HttpGetStatusRequest;
 
-		public HttpStatusServer(string UrlPrefix)
+		public HttpStatusServer(string [] UrlPrefix)
 		{
 			isListening = false;
 			listener = new HttpListener();
 
-			listener.Prefixes.Add(UrlPrefix);
+			foreach (var item in UrlPrefix)
+			{
+				listener.Prefixes.Add(item);
+			}
 		}
 
 		public void Start()
@@ -51,15 +54,19 @@ namespace DbWriterRole
 					ctx.Response.OutputStream.Close();
 					Thread.Sleep(10);
 				}
-
-				int i = 0;
 			});
 		}
 
 		public void Stop()
 		{
 			isListening = false;
-			listener.Stop();
+			try
+			{
+				listener.Stop();
+			}
+			catch
+			{
+			}
 		}
 
 	}
