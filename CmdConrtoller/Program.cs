@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,57 +16,73 @@ namespace CmdConrtoller
 {
 	class Program
 	{
-		static string storageConnStr;
-		static string tasksQueueName;
-		static string resultsQueueName;
-
-
 		static void Main(string[] args)
 		{
-			sendMessageToQueue();
+			if (args.Length != 1)
+			{
+				Console.WriteLine("Specify task filename");
+				Environment.Exit(1);
+			}
+
+			var taskFilename = args[0];
+			var task = getTask(taskFilename);
+
+			sendTask(task);
 		}
 
-
-		static void configureQueue()
+		protected static void sendTask(FileCollectTask task)
 		{
-			storageConnStr = ConfigurationManager.ConnectionStrings["StorageConnectionString"].ConnectionString;
-			tasksQueueName = ConfigurationManager.AppSettings["tasksQueueName"];
-			resultsQueueName = ConfigurationManager.AppSettings["resultsQueueName"];
+			var queue = getQueue();
+
+			var parameters = File.ReadLines(task.InputFilename);
+
+			foreach (var p in parameters)
+			{
+				var message = createMessage(task.SocialNetwork, task.Method, p);
+
+				queue.AddMessage(message, TimeSpan.FromDays(7));
+			}
 		}
 
-		private static void sendMessageToQueue()
+		protected static CloudQueueMessage createMessage(SocialNetwork network, string method, string param)
 		{
-			configureQueue();
-
-			// Retrieve storage account from connection string
-			CloudStorageAccount storageAccount = CloudStorageAccount.Parse(storageConnStr);
-
-			// Create the queue client
-			CloudQueueClient queueClient = storageAccount.CreateCloudQueueClient();
-
-			// Retrieve a reference to a queue
-			CloudQueue queue = queueClient.GetQueueReference(tasksQueueName);
-
-			// Create the queue if it doesn't already exist
-			queue.CreateIfNotExists();
-
-			// Send simple task
-
 			var task = new CollectTask();
-			task.SocialNetwork = SocialNetwork.VKontakte;
-			task.Method = "friends.get";
-			task.Params = "1";
-			//task.Method = "groups.getById";//"groups.getMembers";
-			//task.Params = "48710020, 1"; //48710020, 1
+			task.SocialNetwork = network;
+			task.Method = method;
+			task.Params = param;
 			var messageString = JsonConvert.SerializeObject(task);
 
 			var cbMesage = CloudQueueBlobMessage.CreateMessageWithContent(messageString);
 			var cmMessageString = JsonConvert.SerializeObject(cbMesage);
 
-			CloudQueueMessage message = new CloudQueueMessage(cmMessageString);
+			var message = new CloudQueueMessage(cmMessageString);
 
-			queue.AddMessage(message);
+			return message;
+		}
 
+		protected static FileCollectTask getTask(string filename)
+		{
+			var data = File.ReadAllText(filename);
+			return JsonConvert.DeserializeObject<FileCollectTask>(data);
+		}
+
+		protected static CloudQueue getQueue()
+		{
+			var storageConnStr = ConfigurationManager.ConnectionStrings["StorageConnectionString"].ConnectionString;
+			var tasksQueueName = ConfigurationManager.AppSettings["tasksQueueName"];
+
+			// Retrieve storage account from connection string
+			var storageAccount = CloudStorageAccount.Parse(storageConnStr);
+
+			// Create the queue client
+			var queueClient = storageAccount.CreateCloudQueueClient();
+
+			// Retrieve a reference to a queue
+			var queue = queueClient.GetQueueReference(tasksQueueName);
+
+			queue.CreateIfNotExists();
+
+			return queue;
 		}
 
 	}
