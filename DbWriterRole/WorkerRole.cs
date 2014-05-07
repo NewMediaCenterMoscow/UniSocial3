@@ -24,6 +24,7 @@ namespace DbWriterRole
 			// This is a sample worker implementation. Replace with your logic.
 			Trace.TraceInformation("DbWriterRole entry point called", "Information");
 
+			statusServer.Run();
 			worker.Run();
 		}
 
@@ -47,16 +48,16 @@ namespace DbWriterRole
 			worker.Initialize();
 
 			var endpoint = statusEndpoint.PublicIPEndpoint ?? statusEndpoint.IPEndpoint;
-			statusServer = new HttpStatusServer(new string[] { "http://*:" + endpoint.Port + "/", "http://unisocial.cloudapp.net" + endpoint.Port + "/" });
+			statusServer = new HttpStatusServer(endpoint);
 			statusServer.HttpGetStatusRequest += statusServer_HttpGetStatusRequest;
 
 			try
 			{
 				statusServer.Start();
 			}
-			catch (HttpListenerException ex)
+			catch (Exception ex)
 			{
-				Trace.TraceWarning("HttpListener: " + ex.Message);
+				Trace.TraceError("Status server [" + endpoint + "]: " + ex.Message);
 			}
 
 			return base.OnStart();
@@ -73,9 +74,7 @@ namespace DbWriterRole
 		void statusServer_HttpGetStatusRequest(object sender, HttpGetStatusRequestEventArgs e)
 		{
 			string response = "{\"counter\":" + worker.GetCounter() + "}";
-			var respBytes = Encoding.UTF8.GetBytes(response);
-
-			e.OutputStream.Write(respBytes, 0, respBytes.Length);
+			e.Writer.Write(response);
 		}
 
 	}
