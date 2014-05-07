@@ -51,13 +51,17 @@ namespace Common.Worker
 		protected void collectData(CollectTask collectTask)
 		{
 			var result = apiHelper.GetResult(collectTask);
-			var strResult = JsonConvert.SerializeObject(result);
 
-			var messageToSend = new CollectTaskResult();
-			messageToSend.Task = collectTask;
-			messageToSend.SerializedResult = strResult;
+			if (result != null)
+			{
+				var strResult = JsonConvert.SerializeObject(result);
 
-			sendResult(messageToSend);
+				var messageToSend = new CollectTaskResult();
+				messageToSend.Task = collectTask;
+				messageToSend.SerializedResult = strResult;
+
+				sendResult(messageToSend);
+			}
 		}
 
 		private void sendResult(CollectTaskResult result)

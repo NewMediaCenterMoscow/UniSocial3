@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using Ninject;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -82,7 +83,7 @@ namespace Common
 				var methodSettings = apiSettingsProvider.GetSettingsForMethod(mp.Key);
 				var needType = Type.GetType(mp.Value);
 
-				Type [] apiParamsType = null;
+				Type[] apiParamsType = null;
 				if (methodSettings.BatchSize == 1)
 					apiParamsType = new Type[] { typeof(IApi), typeof(string), typeof(string) };
 				else
@@ -120,15 +121,32 @@ namespace Common
 
 		protected object getApiResult<T>(IApi api, string method, string param)
 		{
-			var task = api.Get<T>(method, param);
-			task.Wait();
-			return task.Result;
+			try
+			{
+				var task = api.Get<T>(method, param);
+				task.Wait();
+				return task.Result;
+
+			}
+			catch (AggregateException ex)
+			{
+				ex.Handle(x => { Trace.TraceError(x.Message); return true; });
+				return null;
+			}
 		}
 		protected object getApiResult<T>(IApi api, string method, List<string> param)
 		{
-			var task = api.Get<T>(method, param);
-			task.Wait();
-			return task.Result;
+			try
+			{
+				var task = api.Get<T>(method, param);
+				task.Wait();
+				return task.Result;
+			}
+			catch (AggregateException ex)
+			{
+				ex.Handle(x => { Trace.TraceError(x.Message); return true; });
+				return null;
+			}
 		}
 	}
 }

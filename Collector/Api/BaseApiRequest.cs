@@ -18,7 +18,7 @@ namespace Collector.Api
 		protected string baseUri;
 
 		protected static int maxRepeats = 10;
-		protected static int baseRepeatInterval = 6000;
+		protected static int baseRepeatInterval = 300;
 
 		public BaseApiRequest(string BaseUri)
 		{
@@ -40,15 +40,40 @@ namespace Collector.Api
 			return builder.Uri;
 		}
 
-		public async Task<JToken> ExecuteRequest(string Method)
+		public virtual async Task<JToken> ExecuteRequest(string Method, NameValueCollection Params)
+		{
+			return await excuteRequest(Method, Params);
+		}
+
+		public virtual async Task<JToken> ExecuteRequest(string Method)
 		{
 			return await ExecuteRequest(Method, new NameValueCollection());
 		}
 
-		public async Task<JToken> ExecuteRequest(string Method, NameValueCollection Params)
+		public virtual async Task<T> ExecuteRequest<T>(string Method)
+		{
+			return await ExecuteRequest<T>(Method, new NameValueCollection());
+		}
+
+		public virtual async Task<T> ExecuteRequest<T>(string Method, NameValueCollection Params)
+		{
+			var jsonResult = await ExecuteRequest(Method, Params);
+
+			return jsonResult.ToObject<T>();
+		}
+
+		protected virtual async Task<JToken> excuteRequest(string Method, NameValueCollection Params)
 		{
 			var requestUri = GetUri(Method, Params);
 
+			var data = await getStringFromUri(requestUri);
+
+			var result = JObject.Parse(data);
+			return result;
+		}
+
+		protected async Task<string> getStringFromUri(Uri uri)
+		{
 			string data = null;
 			var currentRepeat = 0;
 
@@ -58,7 +83,7 @@ namespace Collector.Api
 
 				try
 				{
-					data = await client.GetStringAsync(requestUri);
+					data = await client.GetStringAsync(uri);
 				}
 				catch
 				{
@@ -71,21 +96,9 @@ namespace Collector.Api
 
 				if (data != null)
 				{
-					var result = JObject.Parse(data);
-					return result["response"];
+					return data;
 				}
 			}
-		}
-
-		public async Task<T> ExecuteRequest<T>(string Method)
-		{
-			return await ExecuteRequest<T>(Method, new NameValueCollection());
-		}
-
-		public async Task<T> ExecuteRequest<T>(string Method, NameValueCollection Params)
-		{
-			var jsonResult = await ExecuteRequest(Method, Params);
-			return jsonResult.ToObject<T>();
 		}
 	}
 }

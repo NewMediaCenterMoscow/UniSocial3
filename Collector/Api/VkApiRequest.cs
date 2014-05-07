@@ -1,9 +1,12 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Collector.Api
@@ -48,6 +51,21 @@ namespace Collector.Api
 				Params.Add("access_token", accessToken);
 
 			return base.GetUri(Method, Params);
+		}
+
+		public override async Task<JToken> ExecuteRequest(string Method, NameValueCollection Params)
+		{
+			var res = await base.ExecuteRequest(Method, Params);
+
+			if (res["error"] != null)
+			{
+				var errorCode = (int)res["error"]["error_code"];
+				var errorMessage = (string)res["error"]["error_msg"];
+
+				throw new Exception("VkEx #" + errorCode + ": " + errorMessage);
+			}
+
+			return res["response"];
 		}
 	}
 }
