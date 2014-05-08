@@ -14,19 +14,28 @@ namespace CmdStatus
 		static void Main(string[] args)
 		{
 			var storageConnStr = ConfigurationManager.ConnectionStrings["StorageConnectionString"].ConnectionString;
-			var client = getQueueClient(storageConnStr);
-			
-			var tasksQueueName = ConfigurationManager.AppSettings["tasksQueueName"];
 			var resultQueueName = ConfigurationManager.AppSettings["resultQueueName"];
-
-			var resultQueue = client.GetQueueReference(resultQueueName);
+			var tasksQueueName = ConfigurationManager.AppSettings["tasksQueueName"];
+			
+			var client = getQueueClient(storageConnStr);
 			var taskQueue = client.GetQueueReference(tasksQueueName);
+			var resultQueue = client.GetQueueReference(resultQueueName);
 
-			Console.WriteLine("Tasks: {0}", taskQueue.ApproximateMessageCount);
-			Console.WriteLine("Results: {0}", resultQueue.ApproximateMessageCount);
+			var taskMessages = getQueueLength(taskQueue);
+			var resultMessages = getQueueLength(resultQueue);
 
-			Console.ReadLine();
+			Console.WriteLine("Tasks: {0}", taskMessages);
+			Console.WriteLine("Results: {0}", resultMessages);
 		}
+
+		protected static int getQueueLength(CloudQueue queue)
+		{
+			queue.FetchAttributes();
+			var messageCount = queue.ApproximateMessageCount;
+
+			return messageCount ?? -1;
+		}
+
 		protected static CloudQueueClient getQueueClient(string storageConnStr)
 		{
 			// Retrieve storage account from connection string
