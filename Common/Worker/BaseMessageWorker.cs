@@ -29,12 +29,12 @@ namespace Common.Worker
 			queueName = QueueName;
 		}
 
-		public void Stop()
+		public virtual void Stop()
 		{
 			cancelTokenSource.Cancel();
 		}
 
-		public void Run()
+		public virtual void Run()
 		{
 			processMessageParallerOptions = new ParallelOptions();
 			processMessageParallerOptions.MaxDegreeOfParallelism = 5;
@@ -80,15 +80,21 @@ namespace Common.Worker
 
 				if (messages.Count() != 0)
 				{
-					Parallel.ForEach(messages, processMessageParallerOptions, processMessage);
+					processMessages(messages);
 				}
 				else
 				{
+					Trace.TraceInformation("Sleeping...");
 					Thread.Sleep(baseSleepInterval);
 				}
 			}
 
 			Trace.TraceInformation("Stopped");
+		}
+
+		protected virtual void processMessages(IEnumerable<CloudQueueMessage> messages)
+		{
+			Parallel.ForEach(messages, processMessageParallerOptions, processMessage);
 		}
 
 		protected virtual void processMessage(CloudQueueMessage message)

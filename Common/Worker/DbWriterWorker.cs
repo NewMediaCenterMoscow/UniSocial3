@@ -1,5 +1,6 @@
 ﻿using Common.Database;
 using Common.Model;
+using Microsoft.WindowsAzure.Storage.Queue;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -27,6 +28,14 @@ namespace Common.Worker
 			counter = 0;
 		}
 
+		protected override void processMessages(IEnumerable<CloudQueueMessage> messages)
+		{
+			foreach (var msg in messages)
+			{
+				processMessage(msg);
+			}
+		}
+
 		protected override void processMessage(string message)
 		{
 			base.processMessage(message);
@@ -42,6 +51,7 @@ namespace Common.Worker
 			Interlocked.Decrement(ref counter);
 
 			Trace.TraceInformation("Result saved: " + collectTaskResult.Task.Method);
+
 		}
 
 		public long GetCounter()

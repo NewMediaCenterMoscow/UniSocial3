@@ -10,30 +10,43 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Common.Database
 {
+	public class SqlFieldDescription
+	{
+		public string Name { get; set; }
+		public SqlDbType Type { get; set; }
+	}
+	public class SqlTableDescription
+	{
+		public string TableName { get; set; }
+		public string InsertStatement { get; set; }
+		public List<SqlFieldDescription> Fields { get; set; }
+	}
+	public class DbWriteCommand
+	{
+		public SqlCommand InsertComamnd { get; set; }
+		public SqlBulkCopy BulkCopy { get; set; }
+		public DataTable Table { get; set; }
+	}
+
 	public class DbWriter : IDisposable
 	{
-		protected string connStr;
 		protected SqlConnection sqlConn;
 
-		protected Dictionary<string, Tuple<string, List<Tuple<string, SqlDbType>>>> commands;
-		protected Dictionary<string, DataTable> dataTables;
-
+		protected Dictionary<string, SqlTableDescription> commands;
+		protected delegate void addDataRowDelegate(DataTable dt, object data);
+		protected delegate void setSqlParamsDelegate(SqlCommand cmd, object data);
 
 		protected string settingsFilename = "Database/settings.json";
 
 		public DbWriter(string ConnectionString)
 		{
-			connStr = ConnectionString;
-
-			setConnection();
-
-			commands = new Dictionary<string, Tuple<string, List<Tuple<string, SqlDbType>>>>();
-			dataTables = new Dictionary<string, DataTable>();
-			loadSettings();
+			setConnection(ConnectionString);
+			loadSettings(settingsFilename);
 		}
 
 		public void Dispose()
@@ -47,22 +60,23 @@ namespace Common.Database
 			}
 		}
 
-		protected void setConnection()
+		protected void setConnection(string connStr)
 		{
 			if (sqlConn == null)
 				sqlConn = new SqlConnection(connStr);
-
 		}
 
 		protected void checkConnection()
 		{
-			if (sqlConn.State == ConnectionState.Closed)
+			if (sqlConn.State != ConnectionState.Open)
+			{
 				sqlConn.Open();
+			}
 		}
 
-		protected void loadSettings()
+		protected void loadSettings(string filename)
 		{
-			var json = File.ReadAllText(settingsFilename);
+			var json = File.ReadAllText(filename);
 			var jsonSettings = JObject.Parse(json);
 
 			var param = from item in jsonSettings["items"]
@@ -73,60 +87,73 @@ namespace Common.Database
 							table = (string)item["table"],
 							fields = from prop in item["fields"] 
 									 let jprop = prop as JProperty
-									 select new Tuple<string, SqlDbType>(jprop.Name, (SqlDbType)Enum.Parse(typeof(SqlDbType), (string)jprop.Value, true))
+									 select new SqlFieldDescription()
+									 {
+										 Name = jprop.Name,
+										 Type = (SqlDbType)Enum.Parse(typeof(SqlDbType), (string)jprop.Value, true)
+									 }
 						};
 
+			commands = new Dictionary<string, SqlTableDescription>();
 			foreach (var p in param)
 			{
-				addParam(p.network, p.method, p.table, p.fields.ToList());
+				var key = ApiHelper.GetKey(p.network, p.method);
+				var tableDesc = createSqlTableDescription(p.network, p.method, p.table, p.fields.ToList());
+				commands.Add(key, tableDesc);
 			}
 		}
 
-		private void addParam(SocialNetwork socialNetwork, string method, string table, List<Tuple<string, SqlDbType>> fields)
+		private SqlTableDescription createSqlTableDescription(SocialNetwork socialNetwork, string method, string table, List<SqlFieldDescription> fields)
 		{
-			var key = ApiHelper.GetKey(socialNetwork, method);
-
 			var queryStart = "INSERT INTO " + table;
-			var fs = String.Join(",", fields.Select(ft => ft.Item1));
-			var fp = String.Join(",", fields.Select(ft => "@" + ft.Item1));
+			var fs = String.Join(",", fields.Select(ft => ft.Name));
+			var fp = String.Join(",", fields.Select(ft => "@" + ft.Name));
 			var query = queryStart + " (" + fs + ") VALUES (" + fp + ")";
 
-			commands.Add(key, new Tuple<string, List<Tuple<string, SqlDbType>>>(query, fields));
+			var result = new SqlTableDescription()
+			{
+				TableName = table,
+				InsertStatement = query,
+				Fields = fields
+			};
 
-			var dataTable = new DataTable(table);
-			foreach (var field in fields)
-				dataTable.Columns.Add(field.Item1);
-
-			dataTables.Add(key, dataTable);
+			return result;
 		}
 
-		protected Tuple<SqlCommand, SqlBulkCopy, DataTable> createCommand(CollectTask task)
+		protected DbWriteCommand createCommand(CollectTask task)
 		{
 			var key = ApiHelper.GetKey(task.SocialNetwork, task.Method);
 
-			var query = commands[key].Item1;
-			var sqlParamsTuple = commands[key].Item2;
-
-			var sqlParams = sqlParamsTuple.Select(pt => new SqlParameter("@" + pt.Item1, pt.Item2));//from pt in sqlParamsTuple select new SqlParameter("@" + pt.Item1, pt.Item2);
+			var query = commands[key].InsertStatement;
+			var fields = commands[key].Fields;
+			var tableName = commands[key].TableName;
 
 			var sqlCmd = new SqlCommand(query, sqlConn);
-			sqlCmd.Parameters.AddRange(sqlParams.ToArray());
-
-
+			var dataTable = new DataTable(tableName);
 			var sqlBulk = new SqlBulkCopy(sqlConn);
-			sqlBulk.DestinationTableName = dataTables[key].TableName;
-			var bulkMappings = sqlParamsTuple.Select((pt, index) => new SqlBulkCopyColumnMapping(index, pt.Item1));
+			sqlBulk.DestinationTableName = tableName;
 
-			foreach (var item in bulkMappings)
-				sqlBulk.ColumnMappings.Add(item);
+			for(int i=0;i<fields.Count;i++)
+			{
+				var field = fields[i];
 
-			return new Tuple<SqlCommand, SqlBulkCopy, DataTable>(sqlCmd, sqlBulk, dataTables[key]);
+				sqlCmd.Parameters.Add(new SqlParameter("@" + field.Name, field.Type));
+				sqlBulk.ColumnMappings.Add(new SqlBulkCopyColumnMapping(i, field.Name));
+				dataTable.Columns.Add(field.Name);
+			}
+
+			var result = new DbWriteCommand() 
+			{
+				InsertComamnd = sqlCmd,
+				BulkCopy = sqlBulk,
+				Table = dataTable
+			};
+
+			return result;
 		}
 
 		public void WriteObject(CollectTask task, object data)
 		{
-			checkConnection();
-
 			if (data is VkList<long>)
 			{
 				writeObjects(task, data as VkList<long>);
@@ -153,9 +180,6 @@ namespace Common.Database
 			}
 
 		}
-
-		protected delegate void addDataRowDelegate(DataTable dt, object data);
-		protected delegate void setSqlParamsDelegate(SqlCommand cmd, object data);
 
 		private void writeObjects(CollectTask task, VkList<VkComment> data)
 		{
@@ -296,11 +320,14 @@ namespace Common.Database
 
 		protected void writeObjects(CollectTask task, IEnumerable<object> items, setSqlParamsDelegate setSqlParams, addDataRowDelegate addDataRow)
 		{
+			checkConnection();
+
 			// Create command to bulk copy and insert, as well as a DataTable
-			var sqlCmds = createCommand(task);
-			var insertCmd = sqlCmds.Item1;
-			var bulkCopy = sqlCmds.Item2;
-			var dataTable = sqlCmds.Item3;
+			var dbWriteCmds = createCommand(task);
+
+			var insertCmd = dbWriteCmds.InsertComamnd;
+			var bulkCopy = dbWriteCmds.BulkCopy;
+			var dataTable = dbWriteCmds.Table;
 
 			// Group items in batch
 			var batchSize = 300;
@@ -342,9 +369,6 @@ namespace Common.Database
 
 				}
 			}
-
 		}
-
-
 	}
 }

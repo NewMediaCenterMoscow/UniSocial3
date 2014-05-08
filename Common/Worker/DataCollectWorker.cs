@@ -57,8 +57,8 @@ namespace Common.Worker
 				var strResult = JsonConvert.SerializeObject(result);
 
 				var messageToSend = new CollectTaskResult();
-				messageToSend.Task = collectTask;
 				messageToSend.SerializedResult = strResult;
+				messageToSend.Task = collectTask;
 
 				sendResult(messageToSend);
 			}

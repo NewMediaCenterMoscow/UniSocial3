@@ -36,11 +36,14 @@ namespace CmdConrtoller
 
 			var parameters = File.ReadLines(task.InputFilename);
 
+			long i = 0;
 			foreach (var p in parameters)
 			{
 				var message = createMessage(task.SocialNetwork, task.Method, p);
-
 				queue.AddMessage(message, TimeSpan.FromDays(7));
+
+				Console.WriteLine("Send message #" + i);
+				i++;
 			}
 		}
 

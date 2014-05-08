@@ -24,6 +24,8 @@ namespace CmdStatus
 
 			Console.WriteLine("Tasks: {0}", taskQueue.ApproximateMessageCount);
 			Console.WriteLine("Results: {0}", resultQueue.ApproximateMessageCount);
+
+			Console.ReadLine();
 		}
 		protected static CloudQueueClient getQueueClient(string storageConnStr)
 		{

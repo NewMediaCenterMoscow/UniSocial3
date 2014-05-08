@@ -23,5 +23,6 @@ namespace Common.Model
 		{
 			return "[" + SocialNetwork + "] " + Method;
 		}
+
 	}
 }
