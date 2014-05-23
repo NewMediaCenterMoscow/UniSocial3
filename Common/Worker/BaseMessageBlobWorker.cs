@@ -5,47 +5,18 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Common.Worker
 {
+    [Serializable]
 	public class CloudQueueBlobMessage
 	{
-		private CloudQueueBlobMessage()
-		{
-
-		}
-
-		public static CloudQueueBlobMessage CreateMessageWithContent(string Content)
-		{
-			var message = new CloudQueueBlobMessage();
-			message.Content = Content;
-			message.BlobName = null;
-
-			return message;
-		}
-
-		public static CloudQueueBlobMessage CreateMessageWithBlob(string BlobName)
-		{
-			var message = new CloudQueueBlobMessage();
-			message.Content = null;
-			message.BlobName = BlobName;
-
-			return message;
-		}
-
-		public string Content { get; set; }
 		public string BlobName { get; set; }
-
-		public bool IsInBlob
-		{
-			get
-			{
-				return BlobName != null;
-			}
-		}
 	}
 
 	public class BaseMessageBlobWorker : BaseMessageWorker
@@ -86,33 +57,34 @@ namespace Common.Worker
 		}
 
 
-		protected override void processMessage(CloudQueueMessage message)
+		protected override void processQueueMessage(CloudQueueMessage message)
 		{
-			base.processMessage(message);
+			base.processQueueMessage(message);
 
-			// Get message content
-			var content = message.AsString;
-			var cbMessage = JsonConvert.DeserializeObject<CloudQueueBlobMessage>(content);
+            var rawData = message.AsBytes;
+            var stream = new MemoryStream(rawData);
+            stream.Seek(0, SeekOrigin.Begin);
+            
+            var bFrmt = new BinaryFormatter();
+            var resObject = bFrmt.Deserialize(stream);
 
-			string msgContent = null;
+            if (resObject is CloudQueueBlobMessage)
+            {
+                var cqbm = resObject as CloudQueueBlobMessage;
+                var msgContentRef = container.GetBlockBlobReference(cqbm.BlobName);
+                
+                var msRes = new MemoryStream();
+                msgContentRef.DownloadToStream(msRes);
+                msRes.Seek(0, SeekOrigin.Begin);
 
-			if (!cbMessage.IsInBlob)
-			{
-				msgContent = cbMessage.Content;
-			}
-			else
-			{
-				var msgContentRef = container.GetBlockBlobReference(cbMessage.BlobName);
-				msgContent = msgContentRef.DownloadText();
+                resObject = bFrmt.Deserialize(msRes);
+            }
 
-				msgContentRef.Delete();
-			}
-
-			processMessage(msgContent);
+            processMessage(resObject);
 		}
 
 
-		protected virtual void processMessage(string rawMessageContent)
+		protected virtual void processMessage(object rawMsgObject)
 		{
 			//Trace.TraceInformation("Load message: " + rawMessageContent.GetHashCode(), "Information");
 		}

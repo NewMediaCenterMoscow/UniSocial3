@@ -7,12 +7,14 @@ using System.Threading.Tasks;
 
 namespace Collector.Models.Vk
 {
+    [Serializable]
 	public enum VkGroupType
 	{
 		Group,
 		Page,
 		Event
 	}
+    [Serializable]
 	public class VkGroup
 	{
 		[JsonProperty("id")]

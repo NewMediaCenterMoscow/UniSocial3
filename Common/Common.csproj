@@ -77,11 +77,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ApiHelper.cs" />
+    <Compile Include="Helpers\ApiHelper.cs" />
     <Compile Include="ApiMapping\IMethodMappingProvider.cs" />
     <Compile Include="ApiMapping\BaseMethodMappingProvider.cs" />
     <Compile Include="ApiMapping\VkMethodMappingProvider.cs" />
     <Compile Include="Database\DbWriter.cs" />
+    <Compile Include="Helpers\CloudQueueHelper.cs" />
     <Compile Include="Model\CollectTask.cs" />
     <Compile Include="Model\CollectTaskResult.cs" />
     <Compile Include="NinjectModules\Vk.cs" />

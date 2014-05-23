@@ -8,7 +8,10 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -47,21 +50,21 @@ namespace CmdConrtoller
 			}
 		}
 
-		protected static CloudQueueMessage createMessage(SocialNetwork network, string method, string param)
-		{
-			var task = new CollectTask();
-			task.SocialNetwork = network;
-			task.Method = method;
-			task.Params = param;
-			var messageString = JsonConvert.SerializeObject(task);
+        protected static CloudQueueMessage createMessage(SocialNetwork network, string method, string param)
+        {
+            var task = new CollectTask();
+            task.SocialNetwork = network;
+            task.Method = method;
+            task.Params = param;
 
-			var cbMesage = CloudQueueBlobMessage.CreateMessageWithContent(messageString);
-			var cmMessageString = JsonConvert.SerializeObject(cbMesage);
+            var bFrmt = new BinaryFormatter();
+            var outputStream = new MemoryStream();
+            bFrmt.Serialize(outputStream, task);
+            var result = outputStream.ToArray();
 
-			var message = new CloudQueueMessage(cmMessageString);
-
-			return message;
-		}
+            var message = new CloudQueueMessage(result);
+            return message;
+        }
 
 		protected static FileCollectTask getTask(string filename)
 		{

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Collector.Models.Vk
 {
+    [Serializable]
 	public class VkCityCountry
 	{
 		[JsonProperty("id")]

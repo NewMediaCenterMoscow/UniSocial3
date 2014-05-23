@@ -8,12 +8,14 @@ using System.Threading.Tasks;
 
 namespace Collector.Models.Vk
 {
+    [Serializable]
 	public enum VkUserSex
 	{
 		Undefined,
 		Female,
 		Male
 	}
+    [Serializable]
 	public class VkUser
 	{
 		[JsonProperty("id")]

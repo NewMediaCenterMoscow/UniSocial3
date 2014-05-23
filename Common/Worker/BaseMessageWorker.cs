@@ -18,7 +18,10 @@ namespace Common.Worker
 		protected CloudQueueClient queueClient;
 		protected CloudQueue queue;
 
-		protected int baseSleepInterval = 30000;
+		protected int sleepInterval = 30;
+        protected int maxSleepInterval = 30;
+        protected int minSleepInterval = 1;
+        protected int sleepIntervalStep = 5;
 		protected int messagePerOneRequest = 32;
 		protected CancellationTokenSource cancelTokenSource;
 		protected ParallelOptions processMessageParallerOptions;
@@ -78,26 +81,37 @@ namespace Common.Worker
 			{
 				var messages = queue.GetMessages(messagePerOneRequest);
 
+                Trace.TraceInformation(this.ToString() + " - messages: " + messages.Count());
+
 				if (messages.Count() != 0)
 				{
-					processMessages(messages);
+                    Trace.TraceInformation(this.ToString() + " - processing...");
+                    sleepInterval = minSleepInterval;
+
+                    processQueueMessages(messages);
 				}
 				else
 				{
-					Trace.TraceInformation("Sleeping...");
-					Thread.Sleep(baseSleepInterval);
+                    var sleep = sleepInterval * 1000;
+
+                    sleepInterval += sleepIntervalStep;
+                    if (sleepInterval > maxSleepInterval)
+                        sleepInterval = maxSleepInterval;
+
+                    Trace.TraceInformation(this.ToString() + " - sleeping:" + sleep);
+                    Thread.Sleep(sleep);
 				}
 			}
 
 			Trace.TraceInformation("Stopped");
 		}
 
-		protected virtual void processMessages(IEnumerable<CloudQueueMessage> messages)
+		protected virtual void processQueueMessages(IEnumerable<CloudQueueMessage> messages)
 		{
-			Parallel.ForEach(messages, processMessageParallerOptions, processMessage);
+			Parallel.ForEach(messages, processMessageParallerOptions, processQueueMessage);
 		}
 
-		protected virtual void processMessage(CloudQueueMessage message)
+		protected virtual void processQueueMessage(CloudQueueMessage message)
 		{
 			//Trace.TraceInformation("Get message: " + message.Id, "Information");
 

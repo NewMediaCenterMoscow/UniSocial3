@@ -1,11 +1,14 @@
-﻿using Common.Model;
+﻿using Common.Helpers;
+using Common.Model;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Queue;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -36,11 +39,19 @@ namespace Common.Worker
 			this.resultQueue = createQueue(this.queueClient, this.resultQueueName);
 		}
 
-		protected override void processMessage(string message)
+        protected override void processQueueMessages(IEnumerable<CloudQueueMessage> messages)
+        {
+            foreach (var msg in messages)
+            {
+                processQueueMessage(msg);
+            }
+        }
+
+        protected override void processMessage(object message)
 		{
 			base.processMessage(message);
 
-			var collectTask = JsonConvert.DeserializeObject<CollectTask>(message);
+            var collectTask = message as CollectTask;
 
 			Trace.TraceInformation("Task: " + collectTask.Method);
 
@@ -54,10 +65,8 @@ namespace Common.Worker
 
 			if (result != null)
 			{
-				var strResult = JsonConvert.SerializeObject(result);
-
 				var messageToSend = new CollectTaskResult();
-				messageToSend.SerializedResult = strResult;
+                messageToSend.Result = result;
 				messageToSend.Task = collectTask;
 
 				sendResult(messageToSend);
@@ -66,33 +75,44 @@ namespace Common.Worker
 
 		private void sendResult(CollectTaskResult result)
 		{
-			var msgStr = JsonConvert.SerializeObject(result);
-			CloudQueueMessage msg = formatMessageWitResult(msgStr);
+            var bFrmt = new BinaryFormatter();
+            var outputStream = new MemoryStream();
+            bFrmt.Serialize(outputStream, result);
+            var byteResult = outputStream.ToArray();
 
+            CloudQueueMessage msg = formatMessageWitResult(byteResult);
 			resultQueue.AddMessage(msg);
 
 			Trace.TraceInformation("Result sended: " + result.Task.Method);
 		}
 
-		CloudQueueMessage formatMessageWitResult(string data)
+		CloudQueueMessage formatMessageWitResult(byte[] data)
 		{
-			CloudQueueBlobMessage qbMessage = null;
-			if (data.Length < 30000) // Message is small - send it directly
-			{
-				qbMessage = CloudQueueBlobMessage.CreateMessageWithContent(data);
-			}
-			else // Message is too large - send it with blob
-			{
-				var uniqBytes = UTF8Encoding.UTF8.GetBytes(data.GetHashCode().ToString() + DateTime.Now.ToString());
-				var blobName = Convert.ToBase64String(uniqBytes);
-				var blob = container.GetBlockBlobReference(blobName);
-				blob.UploadText(data);
+            CloudQueueMessage qMessage = null;
 
-				qbMessage = CloudQueueBlobMessage.CreateMessageWithBlob(blobName);
-			}
+            if (CloudQueueHelper.IsAllowedQueueMessageSize(data.LongLength))
+            {
+                qMessage = new CloudQueueMessage(data);
+            }
+            else
+            {
+                var uniqBytes = UTF8Encoding.UTF8.GetBytes(data.GetHashCode().ToString() + DateTime.Now.ToString());
+                var blobName = Convert.ToBase64String(uniqBytes);
+                var blob = container.GetBlockBlobReference(blobName);
+                blob.UploadFromByteArray(data, 0, data.Length);
 
-			var cloudMessage = new CloudQueueMessage(JsonConvert.SerializeObject(qbMessage));
-			return cloudMessage;
+                var cqbm = new CloudQueueBlobMessage();
+                cqbm.BlobName = blobName;
+
+                var bFrmt = new BinaryFormatter();
+                var outputStream = new MemoryStream();
+                bFrmt.Serialize(outputStream, cqbm);
+                var byteResult = outputStream.ToArray();
+
+                qMessage = new CloudQueueMessage(byteResult);
+            }
+
+            return qMessage;
 		}
 
 	}

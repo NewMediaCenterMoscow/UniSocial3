@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Common.Model
 {
+    [Serializable]
 	public enum SocialNetwork
 	{
  		VKontakte,
@@ -13,6 +14,7 @@ namespace Common.Model
 		Twitter
 	}
 
+    [Serializable]
 	public class CollectTask
 	{
 		public SocialNetwork SocialNetwork { get; set; }

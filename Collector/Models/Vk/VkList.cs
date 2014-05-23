@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace Collector.Models.Vk
 {
+    [Serializable]
 	public class VkList<T> : IApiList<VkList<T>>
 	{
 		[JsonProperty("count")]

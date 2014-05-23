@@ -5,7 +5,9 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,7 +17,7 @@ namespace Common.Worker
 	public class DbWriterWorker : BaseMessageBlobWorker
 	{
 		ApiHelper apiHelper;
-		DbWriter dbWriter;
+        //DbWriter dbWriter;
 
 		long counter;
 
@@ -23,31 +25,29 @@ namespace Common.Worker
 			: base(StorageQueueConnectionString, QueueName, ContainerName)
 		{
 			apiHelper = new ApiHelper();
-			dbWriter = new DbWriter(ConnectionString);
+            //dbWriter = new DbWriter(ConnectionString);
 
 			counter = 0;
 		}
 
-		protected override void processMessages(IEnumerable<CloudQueueMessage> messages)
+		protected override void processQueueMessages(IEnumerable<CloudQueueMessage> messages)
 		{
 			foreach (var msg in messages)
 			{
-				processMessage(msg);
+				processQueueMessage(msg);
 			}
 		}
 
-		protected override void processMessage(string message)
+        protected override void processMessage(object message)
 		{
 			base.processMessage(message);
 
-			// Get message content
-			var collectTaskResult = JsonConvert.DeserializeObject<CollectTaskResult>(message);
-			var resuls = apiHelper.DeserializeResult(collectTaskResult.Task, collectTaskResult.SerializedResult);
+            var collectTaskResult = message as CollectTaskResult;
 
 			Trace.TraceInformation("Result received: " + collectTaskResult.Task.Method);
 
 			Interlocked.Increment(ref counter);
-			dbWriter.WriteObject(collectTaskResult.Task, resuls);
+            //dbWriter.WriteObject(collectTaskResult.Task, collectTaskResult.Result);
 			Interlocked.Decrement(ref counter);
 
 			Trace.TraceInformation("Result saved: " + collectTaskResult.Task.Method);

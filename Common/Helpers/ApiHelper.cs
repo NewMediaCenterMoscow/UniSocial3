@@ -21,7 +21,6 @@ namespace Common
 	public class ApiHelper
 	{
 		Dictionary<string, Func<string, object>> apiCalls;
-		Dictionary<string, Func<string, object>> deserializationCalls;
 
 		static Dictionary<SocialNetwork, IKernel> ninjectKernels;
 
@@ -44,14 +43,6 @@ namespace Common
 			return result;
 		}
 
-		public object DeserializeResult(CollectTask task, string result)
-		{
-			var desCall = getCall(deserializationCalls, task.SocialNetwork, task.Method);
-			var res = desCall(result);
-
-			return res;
-		}
-
 		public static string GetKey(SocialNetwork Network, string Method)
 		{
 			return (int)Network + Method;
@@ -60,7 +51,6 @@ namespace Common
 		void setCallParams()
 		{
 			apiCalls = new Dictionary<string, Func<string, object>>();
-			deserializationCalls = new Dictionary<string, Func<string, object>>();
 
 			setCallParams(SocialNetwork.VKontakte);
 		}
@@ -72,10 +62,6 @@ namespace Common
 			var apiSettingsProvider = ninjectKernels[socialNetwork].Get<IApiSettingsProvider>();
 
 			var apiObjType = typeof(ApiHelper);
-			var desObjType = typeof(JsonConvert);
-
-			//var desMethod = desObjType.GetMethod("DeserializeObject", BindingFlags.Static | BindingFlags.Public, Type.DefaultBinder, new Type[] { typeof(string) }, null);
-			var desMethod = desObjType.GetMethods().Where(m => m.Name == "DeserializeObject" && m.IsGenericMethod && m.GetParameters().Count() == 1).First();
 
 			// Key - method name, value - type
 			foreach (var mp in mappings)
@@ -95,10 +81,6 @@ namespace Common
 					addCall(apiCalls, socialNetwork, mp.Key, param => apiGeneric.Invoke(this, new object[] { api, mp.Key, param }));
 				else
 					addCall(apiCalls, socialNetwork, mp.Key, param => apiGeneric.Invoke(this, new object[] { api, mp.Key, param.Split(',').ToList() }));
-
-
-				var desGeneric = desMethod.MakeGenericMethod(needType);
-				addCall(deserializationCalls, socialNetwork, mp.Key, param => desGeneric.Invoke(this, new object[] { param }));
 
 			}
 

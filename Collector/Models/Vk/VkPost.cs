@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace Collector.Models.Vk
 {
+    [Serializable]
 	public enum VkPostType
 	{
 		Post,
@@ -22,6 +23,7 @@ namespace Collector.Models.Vk
 		Video
 	}
 
+    [Serializable]
 	public class VkPost : VKBaseWallObject
 	{
 		[JsonProperty("owner_id")]
