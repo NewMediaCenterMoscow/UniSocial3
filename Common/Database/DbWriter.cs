@@ -154,8 +154,10 @@ namespace Common.Database
 
 		public void WriteObject(CollectTask task, object data)
 		{
-			if (data is VkList<long>)
+			if (data is VkList<long> && task.Method == "likes.getList")
 			{
+				writeObjectsLikes(task, data as VkList<long>);
+			} else if (data is VkList<long>) {
 				writeObjects(task, data as VkList<long>);
 			}
 			if (data is List<VkGroup>)
@@ -317,6 +319,31 @@ namespace Common.Database
 
 			writeObjects(task, data.Items.Cast<object>(), setSqlParam, addDataRow);
 		}
+
+		protected void writeObjectsLikes(CollectTask task, VkList<long> data)
+		{
+			var ids = task.Params.Split('_'); // 1_45546_post => "owner_id", "item_id", "type"
+			var owner_id = long.Parse(ids[0]);
+			var item_id = long.Parse(ids[1]);
+			var type = ids[2];
+
+			addDataRowDelegate addDataRow = (DataTable dt, object dat) =>
+			{
+				var d = (long)dat;
+				dt.Rows.Add(owner_id, item_id, type, d);
+			};
+			setSqlParamsDelegate setSqlParam = (SqlCommand cmd, object dat) =>
+			{
+				var d = (long)dat;
+				cmd.Parameters[0].Value = owner_id;
+				cmd.Parameters[1].Value = item_id;
+				cmd.Parameters[2].Value = type;
+				cmd.Parameters[3].Value = d;
+			};
+
+			writeObjects(task, data.Items.Cast<object>(), setSqlParam, addDataRow);
+		}
+
 
 		protected void writeObjects(CollectTask task, IEnumerable<object> items, setSqlParamsDelegate setSqlParams, addDataRowDelegate addDataRow)
 		{

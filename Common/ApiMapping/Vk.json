@@ -35,5 +35,9 @@
     {
 		"name":"friends.get", 
 		"type": "VkList<long>"
+	},
+    {
+		"name":"likes.getList", 
+		"type": "VkList<long>"
 	}
 ]}

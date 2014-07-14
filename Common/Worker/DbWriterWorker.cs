@@ -17,7 +17,7 @@ namespace Common.Worker
 	public class DbWriterWorker : BaseMessageBlobWorker
 	{
 		ApiHelper apiHelper;
-        //DbWriter dbWriter;
+		DbWriter dbWriter;
 
 		long counter;
 
@@ -25,7 +25,7 @@ namespace Common.Worker
 			: base(StorageQueueConnectionString, QueueName, ContainerName)
 		{
 			apiHelper = new ApiHelper();
-            //dbWriter = new DbWriter(ConnectionString);
+			dbWriter = new DbWriter(ConnectionString);
 
 			counter = 0;
 		}
@@ -47,7 +47,7 @@ namespace Common.Worker
 			Trace.TraceInformation("Result received: " + collectTaskResult.Task.Method);
 
 			Interlocked.Increment(ref counter);
-            //dbWriter.WriteObject(collectTaskResult.Task, collectTaskResult.Result);
+			dbWriter.WriteObject(collectTaskResult.Task, collectTaskResult.Result);
 			Interlocked.Decrement(ref counter);
 
 			Trace.TraceInformation("Result saved: " + collectTaskResult.Task.Method);

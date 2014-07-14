@@ -93,5 +93,15 @@
 			"is_need_access_toke": false,
 			"request_params": {  }
 		}
-	}
+	},
+    {
+		"name":"likes.getList", 
+		"params": {
+			"batch_size": 1,
+			"items_max_count": 1000,
+			"id_params": ["owner_id", "item_id", "type"],
+			"is_need_access_toke": false,
+			"request_params": {  }
+		}
+	},
 ]}
