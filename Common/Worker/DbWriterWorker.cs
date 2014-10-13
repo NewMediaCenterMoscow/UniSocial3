@@ -16,7 +16,6 @@ namespace Common.Worker
 {
 	public class DbWriterWorker : BaseMessageBlobWorker
 	{
-		ApiHelper apiHelper;
 		DbWriter dbWriter;
 
 		long counter;
@@ -24,7 +23,6 @@ namespace Common.Worker
 		public DbWriterWorker(string StorageQueueConnectionString, string QueueName, string ContainerName, string ConnectionString)
 			: base(StorageQueueConnectionString, QueueName, ContainerName)
 		{
-			apiHelper = new ApiHelper();
 			dbWriter = new DbWriter(ConnectionString);
 
 			counter = 0;

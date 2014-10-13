@@ -77,6 +77,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Database\ObjectWritersFactory.cs" />
+    <Compile Include="Database\Writers\VkLikesDbObjectWriter.cs" />
+    <Compile Include="Database\Writers\VkUserGroupsDbObjectWriter.cs" />
+    <Compile Include="Database\Writers\BaseDbObjectWriter.cs" />
+    <Compile Include="Database\IObjectWriter.cs" />
+    <Compile Include="Database\Writers\VkCommentsDbObjectWriter.cs" />
+    <Compile Include="Database\Writers\VkFriendsDbObjectWriter.cs" />
+    <Compile Include="Database\Writers\VkGroupsDbObjectWriter.cs" />
+    <Compile Include="Database\Writers\VkPostsDbObjectWriter.cs" />
+    <Compile Include="Database\Writers\VkUsersDbObjectWriter.cs" />
     <Compile Include="Helpers\ApiHelper.cs" />
     <Compile Include="ApiMapping\IMethodMappingProvider.cs" />
     <Compile Include="ApiMapping\BaseMethodMappingProvider.cs" />
@@ -103,9 +113,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="app.config" />
-    <Content Include="Database\settings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />

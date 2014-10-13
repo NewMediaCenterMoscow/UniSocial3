@@ -33,7 +33,7 @@ namespace CmdStatus
 			queue.FetchAttributes();
 			var messageCount = queue.ApproximateMessageCount;
 
-			return messageCount ?? -1;
+			return messageCount ?? 0;
 		}
 
 		protected static CloudQueueClient getQueueClient(string storageConnStr)

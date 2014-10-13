@@ -48,18 +48,8 @@ namespace Collector.Api
 			}
 		}
 
-		//protected bool isNeedList(Type t)
 		protected bool isNeedList(ApiSettings settings)
 		{
-			//var apiListType = typeof(IApiList<>);
-
-			//var result = 
-			//	t.GetInterfaces().Any(
-			//		it => it.IsGenericType && it.GetGenericTypeDefinition() == apiListType
-			//	);
-			
-			//return result;
-
 			return settings.ItemsMaxCount != 1;
 		}
 

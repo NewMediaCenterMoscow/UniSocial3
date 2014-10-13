@@ -98,7 +98,7 @@ namespace Common.Worker
                     if (sleepInterval > maxSleepInterval)
                         sleepInterval = maxSleepInterval;
 
-                    Trace.TraceInformation(this.ToString() + " - sleeping:" + sleep);
+                    Trace.TraceInformation(this.ToString() + " - sleeping: " + sleep);
                     Thread.Sleep(sleep);
 				}
 			}
