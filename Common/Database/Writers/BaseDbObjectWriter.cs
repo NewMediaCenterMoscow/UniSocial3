@@ -29,11 +29,20 @@ namespace Common.Database.Writers
 			setFieldsFromTask(task);
 
 			var items = convertToObjectsList(data);
+
+			if (!items.Any())
+				return;
+				
+			// remove duplicates
+			var uniqItems = items
+				.GroupBy(o => getItemKey(o))
+				.Select(g => g.First());
+
 			// Group items for batch insert
-			var groupedItems = items
+			var groupedItems = uniqItems
 				.Select((item, index) => new { Index = index, Item = item })
-				.GroupBy(di => di.Index / batchSize)
-				.Select(group => group.Select(gi => gi.Item))
+				.GroupBy(di => di.Index / batchSize , e => e.Item, (key, elem) => elem)
+				//.Select(group => group.Select(gi => gi.Item))
 				;
 
 			var dataTable = createDataTable();
@@ -51,6 +60,9 @@ namespace Common.Database.Writers
 
 					// Let's insert only needed items
 					var itemsToInsert = excludeExistingItems(group);
+					var dupItems = itemsToInsert.GroupBy(o => o.ToString()).Where(g => g.Count() > 1).Select(g => g.Key).ToList();
+					var dupGroup = group.GroupBy(o => o.ToString()).Where(g => g.Count() > 1).Select(g => g.Key).ToList();
+
 					if (itemsToInsert.Any())
 					{
 						fillTableAndDoBulkCopy(itemsToInsert, dataTable);

@@ -63,9 +63,9 @@ namespace Common.Database.Writers
 			row["date"] = post.Date;
 			row["type"] = post.PostType.ToString();
 			row["text"] = post.Text;
-			row["comment_count"] = post.Comments.Count;
-			row["like_count"] = post.Likes.Count;
-			row["repost_count"] = post.Reposts.Count;
+			row["comment_count"] = post.Comments != null ? post.Comments.Count : 0;
+			row["like_count"] = post.Likes != null ? post.Likes.Count : 0;
+			row["repost_count"] = post.Reposts != null ? post.Reposts.Count : 0;
 			row["copy_id"] = copyPost.Id;
 			row["copy_from_id"] = copyPost.FromId;
 			row["copy_to_id"] = copyPost.OwnerId;
