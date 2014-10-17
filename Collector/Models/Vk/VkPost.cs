@@ -63,7 +63,7 @@ namespace Collector.Models.Vk
 
 		public override string ToString()
 		{
-			return OwnerId + "\t-\t" + Id;
+			return OwnerId + " - " + Id;
 		}
 
 	}

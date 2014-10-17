@@ -90,7 +90,7 @@ namespace Collector.Api
 					if (currentRepeat > maxRepeats)
 						throw;
 
-					Thread.Sleep(currentRepeat * baseRepeatInterval);
+					Thread.Sleep(baseRepeatInterval ^ currentRepeat);
 					Trace.TraceInformation("Exception in repeat " + currentRepeat);
 				}
 

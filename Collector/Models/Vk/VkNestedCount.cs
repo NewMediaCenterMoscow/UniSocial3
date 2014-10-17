@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Collector.Models.Vk
 {
+	// TODO: Add constructor
     [Serializable]
 	public class VkNestedCount
 	{

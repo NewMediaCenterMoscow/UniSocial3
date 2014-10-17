@@ -45,7 +45,8 @@ namespace Collector.Api
 
 		public override Uri GetUri(string Method, NameValueCollection Params)
 		{
-			Params.Add(vkParams);
+			if (Params[vkParams.AllKeys.First()] == null)
+				Params.Add(vkParams);
 
 			if (isMethodNeedAuth(Method))
 				Params.Add("access_token", accessToken);
